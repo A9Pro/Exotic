@@ -1,7 +1,11 @@
 import { motion } from "framer-motion";
 import { Home, Menu, ShoppingCart, User } from "lucide-react";
 
-export default function BottomNav({ cartCount = 0, active = "Home" }) {
+export default function BottomNav({
+  cartCount = 0,
+  active = "Home",
+  onNavigate,
+}) {
   const navItems = [
     { label: "Home", icon: Home, value: "Home" },
     { label: "Menu", icon: Menu, value: "Menu" },
@@ -13,7 +17,7 @@ export default function BottomNav({ cartCount = 0, active = "Home" }) {
     <motion.nav
       className={`
         fixed bottom-4 sm:bottom-6
-        left-0 right-0 mx-auto             /* ← this centers it reliably */
+        left-0 right-0 mx-auto
         z-50
         bg-white/70 dark:bg-black/70
         backdrop-blur-lg
@@ -38,6 +42,7 @@ export default function BottomNav({ cartCount = 0, active = "Home" }) {
             key={item.value}
             type="button"
             aria-label={item.label}
+            onClick={() => onNavigate(item.value)}
             className={`
               group relative flex flex-col items-center justify-center
               min-w-[52px] px-2 py-1
@@ -85,7 +90,6 @@ export default function BottomNav({ cartCount = 0, active = "Home" }) {
               {item.label}
             </span>
 
-            {/* Active indicator pill */}
             {isActive && (
               <motion.div
                 layoutId="activeIndicator"
