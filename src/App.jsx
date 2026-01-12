@@ -49,6 +49,22 @@ function App() {
     show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
+  const handleUpdateCart = (updater) => {
+  setCartItems((prev) => {
+    const newCart = updater(prev);
+    setCartCount(newCart.reduce((sum, item) => sum + item.qty, 0));
+    return newCart;
+  });
+};
+
+// Then pass it to CartDrawer:
+<CartDrawer
+  isOpen={isCartOpen}
+  onClose={() => setIsCartOpen(false)}
+  cartItems={cartItems}
+  onUpdateCart={handleUpdateCart}   // ← new prop
+/>
+
   const dishes = [
     {
       name: "Grilled Salmon",
