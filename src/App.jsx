@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Header from "./components/Header";
 import BottomNav from "./components/BottomNav";
 import Button from "./components/ui/Button";
 import Card from "./components/ui/Card";
+import Profile from "./components/Profile";
+import Login from "./components/Login";
 import Checkout from "./components/Checkout";
 import CartDrawer from "./components/CartDrawer";
 import Menu from "./components/Menu";
@@ -14,6 +16,17 @@ function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [activeTab, setActiveTab] = useState("Home");
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check for existing user on mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem("exotic_user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   const handleAddToCart = (dish) => {
     setCartCount((prev) => prev + 1);
@@ -29,6 +42,14 @@ function App() {
     });
   };
 
+  const handleUpdateCart = (updater) => {
+    setCartItems((prev) => {
+      const newCart = updater(prev);
+      setCartCount(newCart.reduce((sum, item) => sum + item.qty, 0));
+      return newCart;
+    });
+  };
+
   const handleCheckout = () => {
     setIsCartOpen(false);
     setShowCheckout(true);
@@ -39,6 +60,7 @@ function App() {
       setIsCartOpen(true);
     } else {
       setActiveTab(tab);
+      setShowCheckout(false);
     }
   };
 
@@ -51,12 +73,21 @@ function App() {
     alert("Order placed successfully! 🎉 We'll deliver soon.");
   };
 
-  const handleUpdateCart = (updater) => {
-    setCartItems((prev) => {
-      const newCart = updater(prev);
-      setCartCount(newCart.reduce((sum, item) => sum + item.qty, 0));
-      return newCart;
-    });
+  const handleLoginSuccess = (userData) => {
+    setUser(userData);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("exotic_user");
+    setUser(null);
+    setIsAuthenticated(false);
+    setActiveTab("Home");
+    alert("Logged out successfully!");
+  };
+
+  const handleUpdateUser = (updatedUser) => {
+    setUser(updatedUser);
   };
 
   // Animation variants
@@ -105,148 +136,147 @@ function App() {
           initial="hidden"
           animate="show"
         >
-          {/* CHECKOUT SCREEN - Shows when showCheckout is true */}
-          {showCheckout && (
+          {showCheckout ? (
             <Checkout
               cartItems={cartItems}
-              total={cartItems.reduce(
-                (sum, item) => sum + item.price * item.qty,
-                0
-              )}
+              total={cartItems.reduce((sum, item) => sum + item.price * item.qty, 0)}
               onBack={() => setShowCheckout(false)}
               onOrderSuccess={handleOrderSuccess}
             />
-          )}
-
-          {/* HOME TAB */}
-          {!showCheckout && activeTab === "Home" && (
+          ) : (
             <>
-              {/* HERO SECTION */}
-              <motion.section variants={itemFadeUp} className="relative mb-10">
-                <div className="relative rounded-3xl overflow-hidden shadow-xl">
-                  <img
-                    src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1200&q=80"
-                    alt="Exotic cuisine"
-                    className="w-full h-[260px] sm:h-[300px] object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+              {activeTab === "Home" && (
+                <>
+                  {/* HERO SECTION */}
+                  <motion.section variants={itemFadeUp} className="relative mb-10">
+                    <div className="relative rounded-3xl overflow-hidden shadow-xl">
+                      <img
+                        src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1200&q=80"
+                        alt="Exotic cuisine"
+                        className="w-full h-[260px] sm:h-[300px] object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-                  <div className="absolute bottom-0 left-0 right-0 p-6 pb-8">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight drop-shadow-lg">
-                      Exotic Flavors
-                    </h1>
-                    <p className="text-white/90 mt-2 text-lg font-light">
-                      Authentic taste • Fresh ingredients
-                    </p>
+                      <div className="absolute bottom-0 left-0 right-0 p-6 pb-8">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight drop-shadow-lg">
+                          Exotic Flavors
+                        </h1>
+                        <p className="text-white/90 mt-2 text-lg font-light">
+                          Authentic taste • Fresh ingredients
+                        </p>
 
-                    <div className="mt-6 flex gap-4">
-                      <Button size="lg" className="flex-1 shadow-lg">
-                        Order Now
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        className="flex-1 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
-                        onClick={() => setActiveTab("Menu")}
-                      >
-                        View Menu
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </motion.section>
-
-              {/* FEATURED DISHES */}
-              <motion.section variants={itemFadeUp} className="mb-10">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-5 px-1">
-                  Featured Dishes
-                </h2>
-
-                <div className="space-y-4">
-                  {dishes.map((dish) => (
-                    <motion.div key={dish.name} variants={itemFadeUp}>
-                      <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300">
-                        <div className="flex items-center p-4">
-                          <img
-                            src={dish.img}
-                            alt={dish.name}
-                            className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover flex-shrink-0 shadow-sm"
-                          />
-
-                          <div className="ml-4 flex-1 min-w-0">
-                            <h3 className="font-semibold text-lg text-gray-900 dark:text-white truncate">
-                              {dish.name}
-                            </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1 line-clamp-2">
-                              {dish.desc}
-                            </p>
-
-                            <div className="mt-4 flex items-center justify-between">
-                              <span className="text-xl font-bold text-rose-600 dark:text-rose-500">
-                                ₦{dish.price.toLocaleString()}
-                              </span>
-
-                              <Button
-                                size="sm"
-                                onClick={() => handleAddToCart(dish)}
-                                className="min-w-[90px]"
-                              >
-                                + Add
-                              </Button>
-                            </div>
-                          </div>
+                        <div className="mt-6 flex gap-4">
+                          <Button size="lg" className="flex-1 shadow-lg">
+                            Order Now
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="lg"
+                            className="flex-1 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20"
+                            onClick={() => setActiveTab("Menu")}
+                          >
+                            View Menu
+                          </Button>
                         </div>
-                      </Card>
-                    </motion.div>
-                  ))}
+                      </div>
+                    </div>
+                  </motion.section>
+
+                  {/* FEATURED DISHES */}
+                  <motion.section variants={itemFadeUp} className="mb-10">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-5 px-1">
+                      Featured Dishes
+                    </h2>
+
+                    <div className="space-y-4">
+                      {dishes.map((dish) => (
+                        <motion.div key={dish.name} variants={itemFadeUp}>
+                          <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300">
+                            <div className="flex items-center p-4">
+                              <img
+                                src={dish.img}
+                                alt={dish.name}
+                                className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover flex-shrink-0 shadow-sm"
+                              />
+
+                              <div className="ml-4 flex-1 min-w-0">
+                                <h3 className="font-semibold text-lg text-gray-900 dark:text-white truncate">
+                                  {dish.name}
+                                </h3>
+                                <p className="text-gray-600 dark:text-gray-400 text-sm mt-1 line-clamp-2">
+                                  {dish.desc}
+                                </p>
+
+                                <div className="mt-4 flex items-center justify-between">
+                                  <span className="text-xl font-bold text-rose-600 dark:text-rose-500">
+                                    ₦{dish.price.toLocaleString()}
+                                  </span>
+
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleAddToCart(dish)}
+                                    className="min-w-[90px]"
+                                  >
+                                    + Add
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </Card>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.section>
+
+                  {/* WHY CHOOSE US */}
+                  <motion.section
+                    variants={itemFadeUp}
+                    className="bg-gradient-to-br from-rose-50 to-orange-50 dark:from-gray-800 dark:to-gray-800 rounded-3xl p-6 shadow-inner"
+                  >
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                      Why Exotic?
+                    </h2>
+                    <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+                      <li className="flex items-start">
+                        <span className="text-rose-600 dark:text-rose-400 mr-3 text-xl">✓</span>
+                        <span>Fresh, premium ingredients sourced daily</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-rose-600 dark:text-rose-400 mr-3 text-xl">✓</span>
+                        <span>Hygienic preparation & safe packaging</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-rose-600 dark:text-rose-400 mr-3 text-xl">✓</span>
+                        <span>Fast delivery & excellent customer service</span>
+                      </li>
+                    </ul>
+                  </motion.section>
+                </>
+              )}
+
+              {activeTab === "Menu" && <Menu onAddToCart={handleAddToCart} />}
+
+              {activeTab === "Profile" && (
+                <>
+                  {isAuthenticated ? (
+                    <Profile
+                      user={user}
+                      onLogout={handleLogout}
+                      onUpdateUser={handleUpdateUser}
+                    />
+                  ) : (
+                    <Login onLoginSuccess={handleLoginSuccess} />
+                  )}
+                </>
+              )}
+
+              {activeTab === "Cart" && (
+                <div className="py-20 text-center text-gray-600 dark:text-gray-400">
+                  <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
+                  <p>Open the cart drawer to proceed</p>
                 </div>
-              </motion.section>
-
-              {/* WHY CHOOSE US */}
-              <motion.section
-                variants={itemFadeUp}
-                className="bg-gradient-to-br from-rose-50 to-orange-50 dark:from-gray-800 dark:to-gray-800 rounded-3xl p-6 shadow-inner"
-              >
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                  Why Exotic?
-                </h2>
-                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                  <li className="flex items-start">
-                    <span className="text-rose-600 dark:text-rose-400 mr-3 text-xl">✓</span>
-                    <span>Fresh, premium ingredients sourced daily</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-rose-600 dark:text-rose-400 mr-3 text-xl">✓</span>
-                    <span>Hygienic preparation & safe packaging</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-rose-600 dark:text-rose-400 mr-3 text-xl">✓</span>
-                    <span>Fast delivery & excellent customer service</span>
-                  </li>
-                </ul>
-              </motion.section>
+              )}
             </>
-          )}
-
-          {/* MENU TAB */}
-          {!showCheckout && activeTab === "Menu" && (
-            <Menu onAddToCart={handleAddToCart} />
-          )}
-
-          {/* PROFILE TAB */}
-          {!showCheckout && activeTab === "Profile" && (
-            <div className="py-20 text-center text-gray-600 dark:text-gray-400">
-              <h2 className="text-2xl font-bold mb-4">Profile</h2>
-              <p>Coming soon – user settings, orders history, etc.</p>
-            </div>
-          )}
-
-          {/* CART TAB */}
-          {!showCheckout && activeTab === "Cart" && (
-            <div className="py-20 text-center text-gray-600 dark:text-gray-400">
-              <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
-              <p>Cart view coming soon – use the drawer for now</p>
-            </div>
           )}
         </motion.main>
 
