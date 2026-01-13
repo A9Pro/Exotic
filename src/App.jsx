@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import BottomNav from "./components/BottomNav";
 import Button from "./components/ui/Button";
 import Card from "./components/ui/Card";
+import Checkout from "./components/Checkout";
 import CartDrawer from "./components/CartDrawer";
 import Menu from "./components/Menu";
 
@@ -11,6 +12,7 @@ function App() {
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
   const [activeTab, setActiveTab] = useState("Home");
 
   const handleAddToCart = (dish) => {
@@ -27,12 +29,34 @@ function App() {
     });
   };
 
+  const handleCheckout = () => {
+    setIsCartOpen(false);
+    setShowCheckout(true);
+  };
+
   const handleNavigate = (tab) => {
     if (tab === "Cart") {
       setIsCartOpen(true);
     } else {
       setActiveTab(tab);
     }
+  };
+
+  const handleOrderSuccess = () => {
+    setCartItems([]);
+    setCartCount(0);
+    setShowCheckout(false);
+    setIsCartOpen(false);
+    setActiveTab("Home");
+    alert("Order placed successfully! 🎉 We'll deliver soon.");
+  };
+
+  const handleUpdateCart = (updater) => {
+    setCartItems((prev) => {
+      const newCart = updater(prev);
+      setCartCount(newCart.reduce((sum, item) => sum + item.qty, 0));
+      return newCart;
+    });
   };
 
   // Animation variants
@@ -48,22 +72,6 @@ function App() {
     hidden: { opacity: 0, y: 24 },
     show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
-
-  const handleUpdateCart = (updater) => {
-  setCartItems((prev) => {
-    const newCart = updater(prev);
-    setCartCount(newCart.reduce((sum, item) => sum + item.qty, 0));
-    return newCart;
-  });
-};
-
-// Then pass it to CartDrawer:
-<CartDrawer
-  isOpen={isCartOpen}
-  onClose={() => setIsCartOpen(false)}
-  cartItems={cartItems}
-  onUpdateCart={handleUpdateCart}   // ← new prop
-/>
 
   const dishes = [
     {
@@ -97,7 +105,21 @@ function App() {
           initial="hidden"
           animate="show"
         >
-          {activeTab === "Home" && (
+          {/* CHECKOUT SCREEN - Shows when showCheckout is true */}
+          {showCheckout && (
+            <Checkout
+              cartItems={cartItems}
+              total={cartItems.reduce(
+                (sum, item) => sum + item.price * item.qty,
+                0
+              )}
+              onBack={() => setShowCheckout(false)}
+              onOrderSuccess={handleOrderSuccess}
+            />
+          )}
+
+          {/* HOME TAB */}
+          {!showCheckout && activeTab === "Home" && (
             <>
               {/* HERO SECTION */}
               <motion.section variants={itemFadeUp} className="relative mb-10">
@@ -206,16 +228,21 @@ function App() {
             </>
           )}
 
-          {activeTab === "Menu" && <Menu onAddToCart={handleAddToCart} />}
+          {/* MENU TAB */}
+          {!showCheckout && activeTab === "Menu" && (
+            <Menu onAddToCart={handleAddToCart} />
+          )}
 
-          {activeTab === "Profile" && (
+          {/* PROFILE TAB */}
+          {!showCheckout && activeTab === "Profile" && (
             <div className="py-20 text-center text-gray-600 dark:text-gray-400">
               <h2 className="text-2xl font-bold mb-4">Profile</h2>
               <p>Coming soon – user settings, orders history, etc.</p>
             </div>
           )}
 
-          {activeTab === "Cart" && (
+          {/* CART TAB */}
+          {!showCheckout && activeTab === "Cart" && (
             <div className="py-20 text-center text-gray-600 dark:text-gray-400">
               <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
               <p>Cart view coming soon – use the drawer for now</p>
@@ -233,6 +260,8 @@ function App() {
           isOpen={isCartOpen}
           onClose={() => setIsCartOpen(false)}
           cartItems={cartItems}
+          onUpdateCart={handleUpdateCart}
+          onCheckout={handleCheckout}
         />
       </div>
     </div>

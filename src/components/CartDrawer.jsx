@@ -1,9 +1,15 @@
 // src/components/CartDrawer.jsx
 import { motion } from "framer-motion";
-import { X, Plus, Minus, Trash2 } from "lucide-react";
+import { X, Plus, Minus, Trash2, ShoppingCart } from "lucide-react";
 import Button from "./ui/Button";
 
-export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateCart }) {
+export default function CartDrawer({
+  isOpen,
+  onClose,
+  cartItems,
+  onUpdateCart,
+  onCheckout,
+}) {
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
@@ -25,7 +31,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateCart })
   };
 
   const handleClearCart = () => {
-    onUpdateCart([]);
+    onUpdateCart(() => []);
   };
 
   return (
@@ -95,7 +101,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateCart })
                     <div className="flex items-center gap-3 mt-2">
                       <button
                         onClick={() => handleQuantityChange(item.name, -1)}
-                        className="p-1.5 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300"
+                        className="p-1.5 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
                       >
                         <Minus size={16} />
                       </button>
@@ -106,7 +112,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateCart })
 
                       <button
                         onClick={() => handleQuantityChange(item.name, 1)}
-                        className="p-1.5 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300"
+                        className="p-1.5 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
                       >
                         <Plus size={16} />
                       </button>
@@ -141,7 +147,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateCart })
                 <Button
                   size="lg"
                   className="w-full"
-                  onClick={() => alert("Proceeding to checkout... (to be implemented)")}
+                  onClick={onCheckout}
                 >
                   Proceed to Checkout
                 </Button>
