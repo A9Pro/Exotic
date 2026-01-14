@@ -20,6 +20,7 @@ function App() {
   const [activeTab, setActiveTab] = useState("Home");
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [orderHistory, setOrderHistory] = useState([]);
 
   // Load saved data on mount
   useEffect(() => {
@@ -35,6 +36,13 @@ function App() {
       const cart = JSON.parse(savedCart);
       setCartItems(cart);
       setCartCount(cart.reduce((sum, item) => sum + item.qty, 0));
+    }
+  }, []);
+
+  useEffect(() => {
+    const savedOrders = localStorage.getItem("exotic_order_history");
+    if (savedOrders) {
+      setOrderHistory(JSON.parse(savedOrders));
     }
   }, []);
 
@@ -104,6 +112,26 @@ function App() {
     stats.totalSpent += orderTotal;
     localStorage.setItem("exotic_customer_stats", JSON.stringify(stats));
 
+    const newOrder = {
+      id: Date.now(), 
+      date: new Date().toLocaleString("en-NG", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      items: [...cartItems],
+      total: cartItems.reduce((sum, item) => sum + item.price * item.qty, 0),
+    };
+
+    setOrderHistory((prev) => {
+      const updated = [newOrder, ...prev];
+      localStorage.setItem("exotic_order_history", JSON.stringify(updated));
+      return updated;
+    });
+
     // Clear cart
     setCartItems([]);
     setCartCount(0);
@@ -131,6 +159,33 @@ function App() {
   const handleUpdateUser = (updatedUser) => {
     setUser(updatedUser);
     toast.success("Profile updated successfully!");
+  };
+
+  const handleReorder = (order) => {
+    // Add all items from the previous order to cart
+    order.items.forEach((item) => {
+      setCartItems((prev) => {
+        const existing = prev.find((cartItem) => cartItem.name === item.name);
+        if (existing) {
+          return prev.map((cartItem) =>
+            cartItem.name === item.name 
+              ? { ...cartItem, qty: cartItem.qty + item.qty } 
+              : cartItem
+          );
+        }
+        return [...prev, { ...item }];
+      });
+    });
+
+    // Update cart count
+    const totalItems = order.items.reduce((sum, item) => sum + item.qty, 0);
+    setCartCount((prev) => prev + totalItems);
+
+    // Show success message and open cart
+    toast.success(`${order.items.length} item(s) re-added to cart! 🛒`);
+    setTimeout(() => {
+      setIsCartOpen(true);
+    }, 500);
   };
 
   // Animation variants
@@ -405,6 +460,8 @@ function App() {
                         user={user}
                         onLogout={handleLogout}
                         onUpdateUser={handleUpdateUser}
+                        orderHistory={orderHistory}
+                        onReorder={handleReorder}
                       />
                     ) : (
                       <Login onLoginSuccess={handleLoginSuccess} />

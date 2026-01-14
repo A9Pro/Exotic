@@ -1,25 +1,48 @@
-// src/components/Profile.jsx
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   User, Wallet, History, LogOut, Plus, Phone, Mail, Edit2, 
-  Save, X, MapPin, Star, Award, TrendingUp, Package 
+  Save, X, MapPin, Star, Award, TrendingUp, Package, 
+  ChevronDown, ChevronUp, ShoppingCart, RefreshCw
 } from "lucide-react";
-import Button from "./ui/Button";
-import Card from "./ui/Card";
 
-export default function Profile({ user, onLogout, onUpdateUser }) {
+// Button Component
+const Button = ({ children, variant = "primary", className = "", ...props }) => {
+  const baseStyles = "px-4 py-2.5 rounded-xl font-medium transition-all duration-200";
+  const variants = {
+    primary: "bg-rose-600 text-white hover:bg-rose-700 active:scale-95",
+    outline: "border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+  };
+  
+  return (
+    <button className={`${baseStyles} ${variants[variant]} ${className}`} {...props}>
+      {children}
+    </button>
+  );
+};
+
+// Card Component
+const Card = ({ children, className = "", ...props }) => {
+  return (
+    <div className={`bg-white dark:bg-gray-900 rounded-2xl ${className}`} {...props}>
+      {children}
+    </div>
+  );
+};
+
+export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [], onReorder }) {
   const [balance, setBalance] = useState(0);
   const [addAmount, setAddAmount] = useState("");
   const [showAddFunds, setShowAddFunds] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showAllOrders, setShowAllOrders] = useState(false);
   const [editForm, setEditForm] = useState({
-    name: user.name || "",
-    phone: user.phone || "",
-    email: user.email || "",
-    address: user.address || "",
-    optionalAddress: user.optionalAddress || "",
+    name: user?.name || "",
+    phone: user?.phone || "",
+    email: user?.email || "",
+    address: user?.address || "",
+    optionalAddress: user?.optionalAddress || "",
   });
 
   // Customer stats (can be fetched from API in production)
@@ -39,7 +62,7 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
     return { rank: "Bronze", color: "text-orange-600", bgColor: "bg-orange-100 dark:bg-orange-950/30", progress: (totalSpent / 10000) * 100 };
   };
 
-  // Load customer stats from localStorage
+  // Load customer stats from localStorage and update when orderHistory changes
   useEffect(() => {
     const savedBalance = localStorage.getItem("exotic_balance");
     const savedStats = localStorage.getItem("exotic_customer_stats");
@@ -50,14 +73,13 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
       const rankInfo = calculateRank(stats.totalSpent);
       setCustomerStats({ ...stats, ...rankInfo });
     }
-  }, []);
+  }, [orderHistory]);
 
   useEffect(() => {
     localStorage.setItem("exotic_balance", balance);
   }, [balance]);
 
-  const handleAddFunds = (e) => {
-    e.preventDefault();
+  const handleAddFunds = () => {
     const amount = parseInt(addAmount, 10);
     if (!amount || amount <= 0) {
       alert("Please enter a valid amount");
@@ -96,19 +118,31 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
 
   const handleCancelEdit = () => {
     setEditForm({
-      name: user.name || "",
-      phone: user.phone || "",
-      email: user.email || "",
-      address: user.address || "",
-      optionalAddress: user.optionalAddress || "",
+      name: user?.name || "",
+      phone: user?.phone || "",
+      email: user?.email || "",
+      address: user?.address || "",
+      optionalAddress: user?.optionalAddress || "",
     });
     setIsEditing(false);
+  };
+
+  const handleReorder = (order) => {
+    if (onReorder) {
+      onReorder(order);
+      alert("Items added to cart!");
+    } else {
+      alert("Re-order functionality not available");
+    }
   };
 
   const rankInfo = calculateRank(customerStats.totalSpent);
   const nextRankThreshold = customerStats.totalSpent < 10000 ? 10000 : 
                            customerStats.totalSpent < 25000 ? 25000 :
                            customerStats.totalSpent < 50000 ? 50000 : 100000;
+
+  // Determine which orders to display
+  const displayedOrders = showAllOrders ? orderHistory : orderHistory.slice(0, 3);
 
   return (
     <motion.div
@@ -167,7 +201,7 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                {(isEditing ? editForm.name : user.name)?.charAt(0) || "?"}
+                {(isEditing ? editForm.name : user?.name)?.charAt(0) || "?"}
               </div>
               <div>
                 {isEditing ? (
@@ -181,11 +215,11 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
                   />
                 ) : (
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {user.name}
+                    {user?.name || "Guest"}
                   </h2>
                 )}
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Member since {user.joined || "January 2025"}
+                  Member since {user?.joined || "January 2025"}
                 </p>
               </div>
             </div>
@@ -236,7 +270,7 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
                     placeholder="0803 123 4567"
                   />
                 ) : (
-                  <p className="text-sm text-gray-900 dark:text-white">{user.phone || "Not set"}</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{user?.phone || "Not set"}</p>
                 )}
               </div>
             </div>
@@ -258,7 +292,7 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
                     placeholder="you@example.com"
                   />
                 ) : (
-                  <p className="text-sm text-gray-900 dark:text-white">{user.email || "Not set"}</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{user?.email || "Not set"}</p>
                 )}
               </div>
             </div>
@@ -281,7 +315,7 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
                   />
                 ) : (
                   <p className="text-sm text-gray-900 dark:text-white">
-                    {user.address || "Not set"}
+                    {user?.address || "Not set"}
                   </p>
                 )}
               </div>
@@ -305,7 +339,7 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
                   />
                 ) : (
                   <p className="text-sm text-gray-700 dark:text-gray-300">
-                    {user.optionalAddress || "Not set"}
+                    {user?.optionalAddress || "Not set"}
                   </p>
                 )}
               </div>
@@ -334,7 +368,7 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
               <Plus size={18} /> Add Funds
             </Button>
           ) : (
-            <form onSubmit={handleAddFunds} className="space-y-4">
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   Amount (₦)
@@ -360,13 +394,14 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
                 </Button>
                 <Button
                   className="flex-1"
-                  type="submit"
+                  type="button"
                   disabled={loading}
+                  onClick={handleAddFunds}
                 >
                   {loading ? "Processing..." : "Add Funds"}
                 </Button>
               </div>
-            </form>
+            </div>
           )}
         </Card>
 
@@ -396,20 +431,86 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
           </div>
         </Card>
 
-        {/* Order History */}
+        {/* Real Order History */}
         <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-3 text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold mb-5 flex items-center gap-3 text-gray-900 dark:text-white">
             <History size={20} className="text-rose-600" />
             Order History
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 text-center py-8">
-            {customerStats.totalOrders === 0 
-              ? "No orders yet. Start ordering delicious meals!" 
-              : "Your order history will appear here"}
-          </p>
-          <Button variant="outline" className="w-full mt-4">
-            View All Orders
-          </Button>
+
+          {!orderHistory || orderHistory.length === 0 ? (
+            <div className="text-center py-10 text-gray-600 dark:text-gray-400">
+              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <History size={28} className="text-gray-400" />
+              </div>
+              <p className="font-medium mb-1">No orders yet</p>
+              <p className="text-sm">Start exploring the menu!</p>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-4">
+                <AnimatePresence>
+                  {displayedOrders.map((order) => (
+                    <motion.div
+                      key={order.id}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="border dark:border-gray-700 rounded-xl p-4 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            Order #{order.id.toString().slice(-6)}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{order.date}</p>
+                        </div>
+                        <span className="text-sm font-bold text-rose-600 dark:text-rose-400">
+                          ₦{order.total.toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div className="text-sm text-gray-700 dark:text-gray-300 space-y-1.5 mb-3">
+                        {order.items.map((item, i) => (
+                          <div key={i} className="flex justify-between">
+                            <span>{item.name} × {item.qty}</span>
+                            <span>₦{(item.price * item.qty).toLocaleString()}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={() => handleReorder(order)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/50 transition-colors font-medium text-sm"
+                      >
+                        <RefreshCw size={16} />
+                        Re-order
+                      </button>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+
+              {orderHistory.length > 3 && (
+                <button
+                  onClick={() => setShowAllOrders(!showAllOrders)}
+                  className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium"
+                >
+                  {showAllOrders ? (
+                    <>
+                      <ChevronUp size={18} />
+                      Show Less
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown size={18} />
+                      View All Orders ({orderHistory.length})
+                    </>
+                  )}
+                </button>
+              )}
+            </>
+          )}
         </Card>
 
         {/* Logout Button */}
