@@ -1,4 +1,3 @@
-// src/components/Checkout.jsx
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, MapPin, Phone, User, CreditCard, Package, CheckCircle2, Copy } from "lucide-react";
@@ -19,7 +18,7 @@ export default function Checkout({
     street: "",
     area: "",
     landmark: "",
-    city: "Lagos",
+    city: "Surulere",
     deliveryInstructions: "",
     deliveryMethod: "dispatch",
     paymentMethod: "bank_transfer",
@@ -29,31 +28,27 @@ export default function Checkout({
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
-  // Delivery fee based on area
   const getDeliveryFee = (area) => {
     if (!area) return 2000;
     const lower = area.toLowerCase().trim();
     const feeMap = {
-      "lekki phase 1": 2500,
-      "lekki": 2500,
-      "ikoyi": 2200,
-      "victoria island": 2200,
-      "yaba": 1500,
-      "surulere": 1800,
-      "ikeja": 1800,
+      "lekki phase 1": 300,
+      "lekki": 3500,
+      "ikoyi": 4500,
+      "victoria island": 3000,
+      "yaba": 1800,
+      "surulere": 1500,
+      "ikeja": 2000,
       "festac": 2000,
       "ajah": 3000,
       "badore": 3500,
-      "abuja": 4000,
-      "port harcourt": 3500,
     };
     return feeMap[lower] || 2000;
   };
 
   const deliveryFee = formData.deliveryMethod === "pickup" ? 0 : getDeliveryFee(formData.area);
   const grandTotal = total + deliveryFee;
-
-  // Phone formatting (080x xxx xxxx)
+ 
   const formatPhone = (value) => {
     const digits = value.replace(/\D/g, "").slice(0, 11);
     if (digits.length <= 4) return digits;
@@ -123,7 +118,7 @@ export default function Checkout({
           `Total: ₦${grandTotal.toLocaleString()}\n\n` +
           `Items:\n${cartItems.map(i => `• ${i.name} × ${i.qty}`).join("\n")}`
         );
-        window.open(`https://wa.me/234XXXXXXXXXX?text=${message}`, "_blank");
+        window.open(`https://wa.me/2348132791933?text=${message}`, "_blank");
         onOrderSuccess();
       }, 4000);
     }, 1200);
@@ -161,7 +156,6 @@ export default function Checkout({
       animate={{ opacity: 1 }}
     >
       <div className="mx-auto max-w-md bg-white dark:bg-gray-900 min-h-screen shadow-sm">
-        {/* Header + Stepper */}
         <div className="sticky top-0 z-20 bg-white dark:bg-gray-900 border-b dark:border-gray-800 shadow-sm">
           <div className="flex items-center px-5 py-4">
             <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
@@ -201,14 +195,12 @@ export default function Checkout({
         </div>
 
         <div className="p-5 space-y-6 pb-40">
-          {/* Step 1: Customer */}
           {step === 1 && (
             <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
               <h2 className="text-xl font-semibold mb-6 flex items-center gap-3 text-gray-900 dark:text-white">
                 <User size={22} className="text-rose-600" /> Customer Information
               </h2>
               <div className="space-y-6">
-                {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Full Name <span className="text-red-500">*</span>
@@ -225,7 +217,6 @@ export default function Checkout({
                   {errors.fullName && <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">{errors.fullName}</p>}
                 </div>
 
-                {/* Phone */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Phone Number <span className="text-red-500">*</span>
@@ -243,7 +234,6 @@ export default function Checkout({
                   {errors.phone && <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">{errors.phone}</p>}
                 </div>
 
-                {/* WhatsApp */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     WhatsApp Number <span className="text-red-500">*</span>
@@ -273,7 +263,6 @@ export default function Checkout({
             </Card>
           )}
 
-          {/* Step 2: Address */}
           {step === 2 && (
             <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
               <h2 className="text-xl font-semibold mb-6 flex items-center gap-3 text-gray-900 dark:text-white">
@@ -329,7 +318,7 @@ export default function Checkout({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">City</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">State</label>
                   <select
                     name="city"
                     value={formData.city}
@@ -337,10 +326,6 @@ export default function Checkout({
                     className="w-full px-4 py-3.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 dark:focus:ring-rose-800/40"
                   >
                     <option value="Lagos">Lagos</option>
-                    <option value="Ibadan">Ibadan</option>
-                    <option value="Abeokuta">Abeokuta</option>
-                    <option value="Abuja">Abuja</option>
-                    <option value="Port Harcourt">Port Harcourt</option>
                   </select>
                 </div>
 
@@ -370,10 +355,8 @@ export default function Checkout({
             </Card>
           )}
 
-          {/* Step 3: Delivery & Payment & Summary */}
           {step === 3 && (
             <div className="space-y-6">
-              {/* Delivery Method */}
               <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
                 <h2 className="text-xl font-semibold mb-5 flex items-center gap-3 text-gray-900 dark:text-white">
                   <Package size={22} className="text-rose-600" /> Delivery Option
@@ -428,7 +411,6 @@ export default function Checkout({
                 </div>
               </Card>
 
-              {/* Payment Method */}
               <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
                 <h2 className="text-xl font-semibold mb-5 flex items-center gap-3 text-gray-900 dark:text-white">
                   <CreditCard size={22} className="text-rose-600" /> Payment Method
@@ -502,7 +484,6 @@ export default function Checkout({
                 )}
               </Card>
 
-              {/* Order Summary */}
               <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
                 <h2 className="text-xl font-semibold mb-5 flex items-center gap-3 text-gray-900 dark:text-white">
                   <Package size={22} className="text-rose-600" /> Order Summary

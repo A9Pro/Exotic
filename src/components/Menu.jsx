@@ -1,7 +1,7 @@
 // src/components/Menu.jsx
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, X } from "lucide-react";
 import Card from "./ui/Card";
 import Button from "./ui/Button";
 
@@ -14,6 +14,7 @@ const menuCategories = [
         desc: "Premium Nigerian jollof with grilled chicken, fried plantain & coleslaw",
         price: 5500,
         img: "https://images.unsplash.com/photo-1625944527473-1c1c3cbb2f55?w=800&h=600&fit=crop",
+        popular: true,
       },
       {
         name: "Seafood Fried Rice",
@@ -26,6 +27,7 @@ const menuCategories = [
         desc: "Traditional unpolished rice with spicy ayamase sauce & assorted meats",
         price: 6200,
         img: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=800&h=600&fit=crop",
+        spicy: true,
       },
       {
         name: "Chinese Fried Rice Special",
@@ -43,6 +45,7 @@ const menuCategories = [
         desc: "Rich melon seed soup with assorted meats, stockfish & smooth pounded yam",
         price: 7500,
         img: "https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=800&h=600&fit=crop",
+        popular: true,
       },
       {
         name: "Oha Soup + Semovita",
@@ -78,18 +81,22 @@ const menuCategories = [
         desc: "Fresh salmon fillet with exotic herbs, garlic butter & citrus glaze",
         price: 12500,
         img: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=800&h=600&fit=crop",
+        premium: true,
       },
       {
         name: "Suya Platter (Beef)",
         desc: "Premium beef skewers with yaji spice, onions, tomatoes & pepper sauce",
         price: 4500,
         img: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&h=600&fit=crop",
+        popular: true,
+        spicy: true,
       },
       {
         name: "Asun (Peppered Goat)",
         desc: "Smoky spicy goat meat stir-fry with bell peppers – extra hot!",
         price: 5800,
         img: "https://images.unsplash.com/photo-1544025162-d766942659cb?w=800&h=600&fit=crop",
+        spicy: true,
       },
       {
         name: "Grilled Chicken (Full)",
@@ -131,6 +138,7 @@ const menuCategories = [
         desc: "Tender ribeye steak with crispy fries, vegetables & pepper sauce",
         price: 9500,
         img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&h=600&fit=crop",
+        premium: true,
       },
     ],
   },
@@ -142,6 +150,7 @@ const menuCategories = [
         desc: "Sweet ripe plantains fried to golden perfection",
         price: 1500,
         img: "https://images.unsplash.com/photo-1589010588553-46e8e7c21788?w=800&h=600&fit=crop",
+        popular: true,
       },
       {
         name: "Moi Moi",
@@ -189,6 +198,7 @@ const menuCategories = [
         desc: "Classic Nigerian cocktail with grenadine, bitters & citrus",
         price: 2000,
         img: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&h=600&fit=crop",
+        popular: true,
       },
       {
         name: "Zobo Drink",
@@ -224,6 +234,7 @@ const menuCategories = [
         desc: "Traditional Nigerian doughnuts dusted with sugar",
         price: 1500,
         img: "https://images.unsplash.com/photo-1626094309830-abbb0c99da4a?w=800&h=600&fit=crop",
+        popular: true,
       },
       {
         name: "Chin Chin",
@@ -280,29 +291,33 @@ export default function Menu({ onAddToCart }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const categories = ["All", ...menuCategories.map(cat => cat.title)];
+  const categories = ["All", ...menuCategories.map((cat) => cat.title)];
 
-  const filteredCategories = menuCategories.filter(category => {
-    if (selectedCategory !== "All" && category.title !== selectedCategory) {
-      return false;
-    }
-    
-    if (searchQuery) {
-      return category.items.some(item => 
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.desc.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    return true;
-  }).map(category => ({
-    ...category,
-    items: category.items.filter(item =>
-      !searchQuery ||
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.desc.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }));
+  const filteredCategories = menuCategories
+    .filter((category) => {
+      if (selectedCategory !== "All" && category.title !== selectedCategory) {
+        return false;
+      }
+
+      if (searchQuery) {
+        return category.items.some(
+          (item) =>
+            item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.desc.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+
+      return true;
+    })
+    .map((category) => ({
+      ...category,
+      items: category.items.filter(
+        (item) =>
+          !searchQuery ||
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.desc.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    }));
 
   return (
     <motion.div
@@ -324,14 +339,27 @@ export default function Menu({ onAddToCart }) {
       {/* Search Bar */}
       <motion.div variants={categoryVariant} className="mb-6">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <Search
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            size={20}
+          />
           <input
             type="text"
-            placeholder="Search dishes..."
+            placeholder="Search for Jollof Rice, Suya, Chapman..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all"
+            className="w-full pl-12 pr-12 py-3.5 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all placeholder:text-gray-400"
           />
+          {searchQuery && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              onClick={() => setSearchQuery("")}
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+            >
+              <X size={18} className="text-gray-400" />
+            </motion.button>
+          )}
         </div>
       </motion.div>
 
@@ -339,17 +367,19 @@ export default function Menu({ onAddToCart }) {
       <motion.div variants={categoryVariant} className="mb-8">
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {categories.map((category) => (
-            <button
+            <motion.button
               key={category}
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                 selectedCategory === category
-                  ? "bg-rose-600 text-white shadow-md"
+                  ? "bg-rose-600 text-white shadow-md scale-105"
                   : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
+              whileHover={{ scale: selectedCategory === category ? 1.05 : 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               {category}
-            </button>
+            </motion.button>
           ))}
         </div>
       </motion.div>
@@ -357,16 +387,13 @@ export default function Menu({ onAddToCart }) {
       {/* Menu Items */}
       <div className="space-y-10">
         {filteredCategories.map((category) => (
-          <motion.section
-            key={category.title}
-            variants={categoryVariant}
-          >
+          <motion.section key={category.title} variants={categoryVariant}>
             <div className="flex items-center gap-3 mb-6">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {category.title}
               </h2>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                ({category.items.length} items)
+              <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+                {category.items.length} items
               </span>
             </div>
 
@@ -383,9 +410,30 @@ export default function Menu({ onAddToCart }) {
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           loading="lazy"
                           onError={(e) => {
-                            e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=600&fit=crop";
+                            e.target.src =
+                              "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=600&fit=crop";
                           }}
                         />
+                        
+                        {/* Badges */}
+                        <div className="absolute top-2 left-2 flex gap-2">
+                          {dish.popular && (
+                            <span className="bg-rose-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+                              Popular
+                            </span>
+                          )}
+                          {dish.spicy && (
+                            <span className="bg-orange-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+                              🌶️ Spicy
+                            </span>
+                          )}
+                          {dish.premium && (
+                            <span className="bg-amber-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+                              ⭐ Premium
+                            </span>
+                          )}
+                        </div>
+
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
 
@@ -409,7 +457,7 @@ export default function Menu({ onAddToCart }) {
                             onClick={() => onAddToCart(dish)}
                             className="min-w-[100px] shadow-sm hover:shadow-md"
                           >
-                            Add to Cart
+                            + Add
                           </Button>
                         </div>
                       </div>
@@ -424,18 +472,17 @@ export default function Menu({ onAddToCart }) {
 
       {/* No Results */}
       {filteredCategories.length === 0 && (
-        <motion.div
-          variants={categoryVariant}
-          className="text-center py-20"
-        >
-          <p className="text-gray-500 dark:text-gray-400 text-lg">
+        <motion.div variants={categoryVariant} className="text-center py-20">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <Search size={40} className="text-gray-400" />
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">
             No dishes found matching "{searchQuery}"
           </p>
-          <Button
-            variant="outline"
-            className="mt-4"
-            onClick={() => setSearchQuery("")}
-          >
+          <p className="text-sm text-gray-400 mb-6">
+            Try searching for something else
+          </p>
+          <Button variant="outline" onClick={() => setSearchQuery("")}>
             Clear Search
           </Button>
         </motion.div>

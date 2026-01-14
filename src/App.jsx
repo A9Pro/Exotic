@@ -10,6 +10,7 @@ import Login from "./components/Login";
 import Checkout from "./components/Checkout";
 import CartDrawer from "./components/CartDrawer";
 import Menu from "./components/Menu";
+import ToastContainer, { toast } from "./components/ToastContainer";
 
 function App() {
   const [cartCount, setCartCount] = useState(0);
@@ -55,8 +56,8 @@ function App() {
       return [...prev, { ...dish, qty: 1 }];
     });
 
-    // Show success toast (optional)
-    showToast(`${dish.name} added to cart!`);
+    // Show success toast with improved messaging
+    toast.success(`${dish.name} added to cart!`);
   };
 
   const handleUpdateCart = (updater) => {
@@ -69,14 +70,14 @@ function App() {
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
-      alert("Please login to proceed with checkout");
+      toast.warning("Please login to proceed with checkout");
       setActiveTab("Profile");
       setIsCartOpen(false);
       return;
     }
     
     if (cartItems.length === 0) {
-      alert("Your cart is empty!");
+      toast.error("Your cart is empty!");
       return;
     }
 
@@ -110,12 +111,13 @@ function App() {
     setIsCartOpen(false);
     setActiveTab("Home");
     
-    alert("Order placed successfully! 🎉 We'll deliver soon.");
+    toast.success("Order placed successfully! 🎉 We'll deliver soon.");
   };
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
+    toast.success(`Welcome back, ${userData.name}!`);
   };
 
   const handleLogout = () => {
@@ -123,23 +125,12 @@ function App() {
     setUser(null);
     setIsAuthenticated(false);
     setActiveTab("Home");
-    alert("Logged out successfully!");
+    toast.info("Logged out successfully!");
   };
 
   const handleUpdateUser = (updatedUser) => {
     setUser(updatedUser);
-  };
-
-  // Simple toast notification
-  const showToast = (message) => {
-    // You can implement a proper toast library later
-    const toast = document.createElement('div');
-    toast.textContent = message;
-    toast.className = 'fixed top-20 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in';
-    document.body.appendChild(toast);
-    setTimeout(() => {
-      toast.remove();
-    }, 2000);
+    toast.success("Profile updated successfully!");
   };
 
   // Animation variants
@@ -202,6 +193,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
+      {/* Toast Container - Add once at top level */}
+      <ToastContainer />
+      
       <div className="mx-auto w-full max-w-md min-h-screen bg-white dark:bg-gray-900 shadow-2xl relative">
         <Header />
 
