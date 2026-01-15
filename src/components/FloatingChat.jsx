@@ -92,7 +92,7 @@ export default function FloatingChat() {
     {
       icon: Clock,
       question: "Business hours?",
-      answer: "Mon-Sun: 8:00 AM - 11:00 PM",
+      answer: "Mon-Sun: 8:00 AM - 12:00 AM",
     },
   ];
 
