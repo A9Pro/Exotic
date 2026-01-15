@@ -10,6 +10,7 @@ import Login from "./components/Login";
 import Checkout from "./components/Checkout";
 import CartDrawer from "./components/CartDrawer";
 import Menu from "./components/Menu";
+import FloatingChat from "./components/FloatingChat";
 import ToastContainer, { toast } from "./components/ToastContainer";
 
 function App() {
@@ -501,6 +502,9 @@ function App() {
           onUpdateCart={handleUpdateCart}
           onCheckout={handleCheckout}
         />
+
+        {/* FLOATING CHAT COMPONENT */}
+        <FloatingChat />
       </div>
     </div>
   );
