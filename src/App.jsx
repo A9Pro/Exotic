@@ -65,7 +65,6 @@ function App() {
       return [...prev, { ...dish, qty: 1 }];
     });
 
-    // Show success toast with improved messaging
     toast.success(`${dish.name} added to cart!`);
   };
 
@@ -104,7 +103,6 @@ function App() {
   };
 
   const handleOrderSuccess = () => {
-    // Update customer stats
     const orderTotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
     const savedStats = localStorage.getItem("exotic_customer_stats");
     const stats = savedStats ? JSON.parse(savedStats) : { totalOrders: 0, totalSpent: 0 };
@@ -124,7 +122,7 @@ function App() {
         minute: "2-digit",
       }),
       items: [...cartItems],
-      total: cartItems.reduce((sum, item) => sum + item.price * item.qty, 0),
+      total: orderTotal,
     };
 
     setOrderHistory((prev) => {
@@ -163,7 +161,6 @@ function App() {
   };
 
   const handleReorder = (order) => {
-    // Add all items from the previous order to cart
     order.items.forEach((item) => {
       setCartItems((prev) => {
         const existing = prev.find((cartItem) => cartItem.name === item.name);
@@ -178,11 +175,9 @@ function App() {
       });
     });
 
-    // Update cart count
     const totalItems = order.items.reduce((sum, item) => sum + item.qty, 0);
     setCartCount((prev) => prev + totalItems);
 
-    // Show success message and open cart
     toast.success(`${order.items.length} item(s) re-added to cart! 🛒`);
     setTimeout(() => {
       setIsCartOpen(true);
@@ -249,14 +244,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
-      {/* Toast Container - Add once at top level */}
       <ToastContainer />
       
       <div className="mx-auto w-full max-w-md min-h-screen bg-white dark:bg-gray-900 shadow-2xl relative">
-        <Header />
+        {!showCheckout && <Header />}
 
         <motion.main
-          className="px-4 sm:px-5 pt-2 pb-24"
+          className={`${showCheckout ? '' : 'px-4 sm:px-5 pt-2 pb-24'}`}
           variants={container}
           initial="hidden"
           animate="show"
@@ -489,11 +483,13 @@ function App() {
           </AnimatePresence>
         </motion.main>
 
-        <BottomNav
-          cartCount={cartCount}
-          active={activeTab}
-          onNavigate={handleNavigate}
-        />
+        {!showCheckout && (
+          <BottomNav
+            cartCount={cartCount}
+            active={activeTab}
+            onNavigate={handleNavigate}
+          />
+        )}
 
         <CartDrawer
           isOpen={isCartOpen}
@@ -503,8 +499,7 @@ function App() {
           onCheckout={handleCheckout}
         />
 
-        {/* FLOATING CHAT COMPONENT */}
-        <FloatingChat />
+        {!showCheckout && <FloatingChat />}
       </div>
     </div>
   );

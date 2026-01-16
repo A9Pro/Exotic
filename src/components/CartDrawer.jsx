@@ -65,13 +65,13 @@ export default function CartDrawer({
           >
             <div className="flex flex-col h-full">
               {/* Header */}
-              <div className="p-5 border-b dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-900 sticky top-0 z-10">
+              <div className="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between bg-white dark:bg-gray-900 sticky top-0 z-10">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                   Your Cart ({cartItems.length})
                 </h2>
                 <motion.button
                   onClick={onClose}
-                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-400"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -80,7 +80,7 @@ export default function CartDrawer({
               </div>
 
               {/* Items list */}
-              <div className="flex-1 overflow-y-auto p-5">
+              <div className="flex-1 overflow-y-auto p-5 bg-gray-50 dark:bg-gray-950">
                 {cartItems.length === 0 ? (
                   <motion.div
                     className="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400"
@@ -109,14 +109,14 @@ export default function CartDrawer({
                       }
                     }}
                   >
-                    {cartItems.map((item, index) => (
+                    {cartItems.map((item) => (
                       <motion.div
                         key={item.name}
                         variants={{
                           hidden: { opacity: 0, x: -20 },
                           visible: { opacity: 1, x: 0 }
                         }}
-                        className="flex items-center gap-4 bg-gray-50 dark:bg-gray-800 p-4 rounded-xl transition-all duration-200 hover:shadow-md"
+                        className="flex items-center gap-4 bg-white dark:bg-gray-800 p-4 rounded-xl transition-all duration-200 hover:shadow-md border border-gray-100 dark:border-gray-700"
                       >
                         <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                           <img
@@ -138,20 +138,20 @@ export default function CartDrawer({
                           <div className="flex items-center gap-3 mt-2">
                             <motion.button
                               onClick={() => handleQuantityChange(item.name, -1)}
-                              className="p-1.5 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                              className="p-1.5 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                             >
                               <Minus size={16} />
                             </motion.button>
 
-                            <span className="w-8 text-center font-medium">
+                            <span className="w-8 text-center font-medium text-gray-900 dark:text-white">
                               {item.qty}
                             </span>
 
                             <motion.button
                               onClick={() => handleQuantityChange(item.name, 1)}
-                              className="p-1.5 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                              className="p-1.5 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300"
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                             >
@@ -166,7 +166,7 @@ export default function CartDrawer({
                           </p>
                           <motion.button
                             onClick={() => handleRemoveItem(item.name)}
-                            className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1 transition-colors"
+                            className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm flex items-center gap-1 transition-colors"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
@@ -182,7 +182,7 @@ export default function CartDrawer({
               {/* Footer / Summary */}
               {cartItems.length > 0 && (
                 <motion.div
-                  className="border-t dark:border-gray-700 p-5 bg-white dark:bg-gray-900"
+                  className="border-t border-gray-200 dark:border-gray-800 p-5 bg-white dark:bg-gray-900"
                   initial={{ y: 50, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.1 }}
@@ -195,11 +195,11 @@ export default function CartDrawer({
                     </div>
                     <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                       <span>Delivery</span>
-                      <span className="text-green-600 dark:text-green-400">FREE</span>
+                      <span className="text-green-600 dark:text-green-400 font-medium">FREE</span>
                     </div>
-                    <div className="border-t dark:border-gray-700 pt-2">
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
                       <div className="flex justify-between text-lg font-bold">
-                        <span>Total</span>
+                        <span className="text-gray-900 dark:text-white">Total</span>
                         <span className="text-rose-600 dark:text-rose-400">
                           ₦{total.toLocaleString()}
                         </span>
