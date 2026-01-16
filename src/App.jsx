@@ -12,8 +12,10 @@ import CartDrawer from "./components/CartDrawer";
 import Menu from "./components/Menu";
 import FloatingChat from "./components/FloatingChat";
 import ToastContainer, { toast } from "./components/ToastContainer";
+import { NotificationProvider, useNotifications } from "./context/NotificationContext";
+import { orderNotifications, promoNotifications } from "./services/notificationService";
 
-function App() {
+function AppContent() {
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -22,6 +24,9 @@ function App() {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [orderHistory, setOrderHistory] = useState([]);
+
+  // Get notification context
+  const { addNotification } = useNotifications();
 
   // Load saved data on mount
   useEffect(() => {
@@ -111,8 +116,12 @@ function App() {
     stats.totalSpent += orderTotal;
     localStorage.setItem("exotic_customer_stats", JSON.stringify(stats));
 
+    // Generate order number
+    const orderNumber = Math.floor(1000 + Math.random() * 9000);
+
     const newOrder = {
       id: Date.now(), 
+      orderNumber: orderNumber,
       date: new Date().toLocaleString("en-NG", {
         weekday: "short",
         year: "numeric",
@@ -123,6 +132,7 @@ function App() {
       }),
       items: [...cartItems],
       total: orderTotal,
+      status: "confirmed", // confirmed, preparing, delivering, delivered
     };
 
     setOrderHistory((prev) => {
@@ -138,13 +148,37 @@ function App() {
     setIsCartOpen(false);
     setActiveTab("Home");
     
-    toast.success("Order placed successfully! 🎉 We'll deliver soon.");
+    toast.success("Order placed successfully! 🎉");
+
+    // Add real-time notifications for order tracking
+    addNotification(orderNotifications.orderPlaced(orderNumber));
+
+    // Simulate order status updates (for demo - in production these would come from backend)
+    setTimeout(() => {
+      addNotification(orderNotifications.orderPreparing(orderNumber));
+    }, 3000); // 3 seconds for demo (in production: 2 minutes)
+
+    setTimeout(() => {
+      addNotification(orderNotifications.orderOutForDelivery(orderNumber, 25));
+    }, 8000); // 8 seconds for demo (in production: 15 minutes)
+
+    setTimeout(() => {
+      addNotification(orderNotifications.orderDelivered(orderNumber));
+    }, 15000); // 15 seconds for demo (in production: 40 minutes)
   };
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
     toast.success(`Welcome back, ${userData.name}!`);
+
+    // Send welcome promo notification for first-time users
+    if (!localStorage.getItem("exotic_first_login")) {
+      setTimeout(() => {
+        addNotification(promoNotifications.firstOrderDiscount());
+      }, 1000);
+      localStorage.setItem("exotic_first_login", "true");
+    }
   };
 
   const handleLogout = () => {
@@ -499,4 +533,11 @@ function App() {
   );
 }
 
-export default App;
+// Wrap entire app with NotificationProvider
+export default function App() {
+  return (
+    <NotificationProvider>
+      <AppContent />
+    </NotificationProvider>
+  );
+}

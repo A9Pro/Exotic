@@ -1,49 +1,22 @@
+// src/components/Header.jsx
 import { useState, useEffect, useRef } from "react";
 import { Sun, Moon, Bell, X, Tag, Megaphone, AlertCircle, Package, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNotifications } from "../context/NotificationContext";
 
 export default function Header() {
   const [isDark, setIsDark] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const notificationRef = useRef(null);
 
-  // Sample notifications - replace with real data from your backend/state
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: "promo",
-      title: "50% Off on Jollof Rice!",
-      message: "Order now and get 50% discount on all Jollof Rice varieties",
-      time: "2 hours ago",
-      read: false,
-    },
-    {
-      id: 2,
-      type: "order",
-      title: "Order #1234 is on the way",
-      message: "Your order will arrive in 15 minutes",
-      time: "30 mins ago",
-      read: false,
-    },
-    {
-      id: 3,
-      type: "announcement",
-      title: "New Menu Items Available",
-      message: "Check out our new seafood selection",
-      time: "1 day ago",
-      read: true,
-    },
-    {
-      id: 4,
-      type: "news",
-      title: "We're Now on Instagram!",
-      message: "Follow us @exoticfoods for exclusive deals",
-      time: "2 days ago",
-      read: true,
-    },
-  ]);
-
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const {
+    notifications,
+    unreadCount,
+    isOpen,
+    setIsOpen,
+    markAsRead,
+    markAllAsRead,
+    clearAll,
+  } = useNotifications();
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -59,18 +32,18 @@ export default function Header() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
-        setIsNotificationOpen(false);
+        setIsOpen(false);
       }
     };
 
-    if (isNotificationOpen) {
+    if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isNotificationOpen]);
+  }, [isOpen, setIsOpen]);
 
   const toggleTheme = () => {
     setIsDark((prev) => {
@@ -96,6 +69,8 @@ export default function Header() {
         return <Megaphone size={18} className="text-purple-600 dark:text-purple-400" />;
       case "news":
         return <AlertCircle size={18} className="text-orange-600 dark:text-orange-400" />;
+      case "system":
+        return <Bell size={18} className="text-gray-600 dark:text-gray-400" />;
       default:
         return <Bell size={18} className="text-gray-600 dark:text-gray-400" />;
     }
@@ -111,6 +86,8 @@ export default function Header() {
         return "bg-purple-100 dark:bg-purple-950/30";
       case "news":
         return "bg-orange-100 dark:bg-orange-950/30";
+      case "system":
+        return "bg-gray-100 dark:bg-gray-800";
       default:
         return "bg-gray-100 dark:bg-gray-800";
     }
@@ -118,38 +95,21 @@ export default function Header() {
 
   const handleNotificationClick = (notification) => {
     // Mark as read
-    setNotifications(prev =>
-      prev.map(n => n.id === notification.id ? { ...n, read: true } : n)
-    );
+    markAsRead(notification.id);
 
-    // Handle different notification types
-    switch (notification.type) {
-      case "order":
-        // Navigate to order tracking or open order details
-        console.log("Open order:", notification);
-        break;
-      case "promo":
-        // Navigate to menu or specific promo page
-        console.log("Open promo:", notification);
-        break;
-      case "announcement":
-      case "news":
-        // Open full announcement/news
-        console.log("Open announcement:", notification);
-        break;
-      default:
-        break;
+    // Handle actionable notifications
+    if (notification.actionable) {
+      // You can navigate or perform actions here
+      console.log("Action:", notification.actionText, notification.actionData);
+      
+      // Example: Navigate to order tracking
+      if (notification.actionData?.orderNumber) {
+        // Navigate to order details page
+        // e.g., navigate(`/orders/${notification.actionData.orderNumber}`);
+      }
     }
 
-    setIsNotificationOpen(false);
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
-
-  const clearAll = () => {
-    setNotifications([]);
+    setIsOpen(false);
   };
 
   return (
@@ -168,11 +128,11 @@ export default function Header() {
             {/* Notification */}
             <div className="relative" ref={notificationRef}>
               <motion.button
-                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                onClick={() => setIsOpen(!isOpen)}
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.94 }}
                 className={`relative rounded-lg p-2 transition-colors ${
-                  isNotificationOpen
+                  isOpen
                     ? "bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-white"
                     : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800"
                 }`}
@@ -180,15 +140,19 @@ export default function Header() {
               >
                 <Bell size={20} strokeWidth={1.8} />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white ring-2 ring-white dark:ring-neutral-950">
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white ring-2 ring-white dark:ring-neutral-950"
+                  >
                     {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
+                  </motion.span>
                 )}
               </motion.button>
 
               {/* Notification Dropdown */}
               <AnimatePresence>
-                {isNotificationOpen && (
+                {isOpen && (
                   <motion.div
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -209,7 +173,7 @@ export default function Header() {
                         )}
                       </div>
                       <button
-                        onClick={() => setIsNotificationOpen(false)}
+                        onClick={() => setIsOpen(false)}
                         className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
                       >
                         <X size={18} />
@@ -261,9 +225,16 @@ export default function Header() {
                                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 line-clamp-2">
                                     {notification.message}
                                   </p>
-                                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                                    {notification.time}
-                                  </p>
+                                  <div className="flex items-center justify-between mt-1">
+                                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                                      {notification.time}
+                                    </p>
+                                    {notification.actionable && (
+                                      <span className="text-xs text-rose-600 dark:text-rose-400 font-medium">
+                                        {notification.actionText}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                                 <ChevronRight size={16} className="text-gray-400 dark:text-gray-600 flex-shrink-0 mt-1" />
                               </div>
