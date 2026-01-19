@@ -6,7 +6,6 @@ import {
   ChevronDown, ChevronUp, ShoppingCart, RefreshCw
 } from "lucide-react";
 
-// Button Component
 const Button = ({ children, variant = "primary", className = "", ...props }) => {
   const baseStyles = "px-4 py-2.5 rounded-xl font-medium transition-all duration-200";
   const variants = {
@@ -21,7 +20,6 @@ const Button = ({ children, variant = "primary", className = "", ...props }) => 
   );
 };
 
-// Card Component
 const Card = ({ children, className = "", ...props }) => {
   return (
     <div className={`bg-white dark:bg-gray-900 rounded-2xl ${className}`} {...props}>
@@ -45,7 +43,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
     optionalAddress: user?.optionalAddress || "",
   });
 
-  // Customer stats (can be fetched from API in production)
   const [customerStats, setCustomerStats] = useState({
     totalOrders: 0,
     totalSpent: 0,
@@ -53,7 +50,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
     rankProgress: 0,
   });
 
-  // Calculate customer rank based on total spent
   const calculateRank = (totalSpent) => {
     if (totalSpent >= 100000) return { rank: "Diamond", color: "text-blue-600", bgColor: "bg-blue-100 dark:bg-blue-950/30", progress: 100 };
     if (totalSpent >= 50000) return { rank: "Platinum", color: "text-purple-600", bgColor: "bg-purple-100 dark:bg-purple-950/30", progress: (totalSpent / 100000) * 100 };
@@ -62,7 +58,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
     return { rank: "Bronze", color: "text-orange-600", bgColor: "bg-orange-100 dark:bg-orange-950/30", progress: (totalSpent / 10000) * 100 };
   };
 
-  // Load customer stats from localStorage and update when orderHistory changes
   useEffect(() => {
     const savedBalance = localStorage.getItem("exotic_balance");
     const savedStats = localStorage.getItem("exotic_customer_stats");
@@ -141,7 +136,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
                            customerStats.totalSpent < 25000 ? 25000 :
                            customerStats.totalSpent < 50000 ? 50000 : 100000;
 
-  // Determine which orders to display
   const displayedOrders = showAllOrders ? orderHistory : orderHistory.slice(0, 3);
 
   return (
@@ -152,7 +146,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
       transition={{ duration: 0.4 }}
     >
       <div className="space-y-5">
-        {/* Customer Rank Card */}
         <Card className={`p-6 shadow-sm border ${rankInfo.bgColor} border-transparent`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -171,7 +164,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
             <Star size={28} className={rankInfo.color} fill="currentColor" />
           </div>
 
-          {/* Progress to next rank */}
           {rankInfo.rank !== "Diamond" && (
             <div className="mt-4">
               <div className="flex items-center justify-between text-sm mb-2">
@@ -196,7 +188,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
           )}
         </Card>
 
-        {/* User Info Card */}
         <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
@@ -253,7 +244,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
           </div>
 
           <div className="space-y-4">
-            {/* Phone */}
             <div className="flex items-start gap-3">
               <Phone size={18} className="text-gray-500 dark:text-gray-400 flex-shrink-0 mt-1" />
               <div className="flex-1">
@@ -275,7 +265,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
               </div>
             </div>
 
-            {/* Email */}
             <div className="flex items-start gap-3">
               <Mail size={18} className="text-gray-500 dark:text-gray-400 flex-shrink-0 mt-1" />
               <div className="flex-1">
@@ -297,7 +286,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
               </div>
             </div>
 
-            {/* Primary Address */}
             <div className="flex items-start gap-3">
               <MapPin size={18} className="text-rose-600 dark:text-rose-400 flex-shrink-0 mt-1" />
               <div className="flex-1">
@@ -321,7 +309,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
               </div>
             </div>
 
-            {/* Optional Address */}
             <div className="flex items-start gap-3">
               <MapPin size={18} className="text-gray-400 dark:text-gray-500 flex-shrink-0 mt-1" />
               <div className="flex-1">
@@ -347,7 +334,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
           </div>
         </Card>
 
-        {/* Wallet Card */}
         <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold flex items-center gap-3 text-gray-900 dark:text-white">
@@ -405,7 +391,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
           )}
         </Card>
 
-        {/* Order Statistics */}
         <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-3 text-gray-900 dark:text-white">
             <TrendingUp size={20} className="text-rose-600" />
@@ -431,7 +416,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
           </div>
         </Card>
 
-        {/* Real Order History */}
         <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
           <h3 className="text-lg font-semibold mb-5 flex items-center gap-3 text-gray-900 dark:text-white">
             <History size={20} className="text-rose-600" />
@@ -513,7 +497,6 @@ export default function Profile({ user, onLogout, onUpdateUser, orderHistory = [
           )}
         </Card>
 
-        {/* Logout Button */}
         <Button
           variant="outline"
           className="w-full flex items-center justify-center gap-2 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-950/30"

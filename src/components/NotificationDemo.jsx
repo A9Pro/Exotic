@@ -1,4 +1,3 @@
-// src/components/NotificationDemo.jsx
 import { motion } from "framer-motion";
 import { Bell, Package, Tag, Megaphone, Newspaper, RefreshCw } from "lucide-react";
 import Button from "./ui/Button";
@@ -131,7 +130,6 @@ export default function NotificationDemo() {
       animate={{ opacity: 1, y: 0 }}
     >
       <div className="space-y-6">
-        {/* Header */}
         <div className="text-center mb-6">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center">
             <Bell size={32} className="text-white" />
@@ -144,7 +142,6 @@ export default function NotificationDemo() {
           </p>
         </div>
 
-        {/* Stats */}
         <Card className="p-4 border border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between">
             <div>
@@ -177,7 +174,6 @@ export default function NotificationDemo() {
           </div>
         </Card>
 
-        {/* Test Categories */}
         {testCategories.map((category) => {
           const colors = getColorClasses(category.color);
           return (
@@ -209,7 +205,6 @@ export default function NotificationDemo() {
           );
         })}
 
-        {/* Instructions */}
         <Card className="p-6 border-2 border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/20">
           <h3 className="font-bold text-gray-900 dark:text-white mb-3">
             How to Use

@@ -1,4 +1,3 @@
-// src/components/CartDrawer.jsx
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Minus, Trash2, ShoppingCart } from "lucide-react";
 import Button from "./ui/Button";
@@ -45,7 +44,6 @@ export default function CartDrawer({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             className="fixed inset-0 bg-black/60 z-40"
             initial={{ opacity: 0 }}
@@ -54,8 +52,7 @@ export default function CartDrawer({
             transition={{ duration: 0.2 }}
             onClick={onClose}
           />
-
-          {/* Drawer */}
+          
           <motion.div
             className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white dark:bg-gray-900 z-50 shadow-2xl overflow-hidden"
             initial={{ x: "100%" }}
@@ -64,7 +61,6 @@ export default function CartDrawer({
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
           >
             <div className="flex flex-col h-full">
-              {/* Header */}
               <div className="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between bg-white dark:bg-gray-900 sticky top-0 z-10">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                   Your Cart ({cartItems.length})
@@ -79,7 +75,6 @@ export default function CartDrawer({
                 </motion.button>
               </div>
 
-              {/* Items list */}
               <div className="flex-1 overflow-y-auto p-5 bg-gray-50 dark:bg-gray-950">
                 {cartItems.length === 0 ? (
                   <motion.div
@@ -179,7 +174,6 @@ export default function CartDrawer({
                 )}
               </div>
 
-              {/* Footer / Summary */}
               {cartItems.length > 0 && (
                 <motion.div
                   className="border-t border-gray-200 dark:border-gray-800 p-5 bg-white dark:bg-gray-900"
@@ -187,7 +181,6 @@ export default function CartDrawer({
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.1 }}
                 >
-                  {/* Price Breakdown */}
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                       <span>Subtotal</span>

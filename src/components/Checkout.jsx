@@ -150,7 +150,6 @@ export default function Checkout({ cartItems, total, onBack, onOrderSuccess }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
-      {/* Header */}
       <div className="sticky top-0 z-20 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
         <div className="flex items-center px-5 py-4">
           <button 
@@ -162,7 +161,6 @@ export default function Checkout({ cartItems, total, onBack, onOrderSuccess }) {
           <h1 className="text-xl font-semibold ml-3 text-gray-900 dark:text-white">Checkout</h1>
         </div>
 
-        {/* Progress Stepper */}
         <div className="px-6 pb-5">
           <div className="flex justify-between relative">
             {["Customer", "Address", "Payment", "Review"].map((label, idx) => (
@@ -194,7 +192,6 @@ export default function Checkout({ cartItems, total, onBack, onOrderSuccess }) {
       </div>
 
       <div className="p-5 space-y-6 pb-20">
-        {/* STEP 1: Customer Info */}
         {step === 1 && (
           <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
             <h2 className="text-xl font-semibold mb-6 flex items-center gap-3 text-gray-900 dark:text-white">
@@ -263,7 +260,6 @@ export default function Checkout({ cartItems, total, onBack, onOrderSuccess }) {
           </Card>
         )}
 
-        {/* STEP 2: Delivery Address */}
         {step === 2 && (
           <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
             <h2 className="text-xl font-semibold mb-6 flex items-center gap-3 text-gray-900 dark:text-white">
@@ -356,10 +352,8 @@ export default function Checkout({ cartItems, total, onBack, onOrderSuccess }) {
           </Card>
         )}
 
-        {/* STEP 3: Payment & Review */}
         {step === 3 && (
           <div className="space-y-6">
-            {/* Delivery Option */}
             <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
               <h2 className="text-xl font-semibold mb-5 flex items-center gap-3 text-gray-900 dark:text-white">
                 <Package size={22} className="text-rose-600 dark:text-rose-400" /> Delivery Option
@@ -414,7 +408,6 @@ export default function Checkout({ cartItems, total, onBack, onOrderSuccess }) {
               </div>
             </Card>
 
-            {/* Payment Method */}
             <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
               <h2 className="text-xl font-semibold mb-5 flex items-center gap-3 text-gray-900 dark:text-white">
                 <CreditCard size={22} className="text-rose-600 dark:text-rose-400" /> Payment Method
@@ -488,7 +481,6 @@ export default function Checkout({ cartItems, total, onBack, onOrderSuccess }) {
               )}
             </Card>
 
-            {/* Order Summary */}
             <Card className="p-6 shadow-sm border border-gray-200 dark:border-gray-800">
               <h2 className="text-xl font-semibold mb-5 flex items-center gap-3 text-gray-900 dark:text-white">
                 <Package size={22} className="text-rose-600 dark:text-rose-400" /> Order Summary

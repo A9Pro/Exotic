@@ -1,4 +1,3 @@
-// src/components/Header.jsx
 import { useState, useEffect, useRef } from "react";
 import { Sun, Moon, Bell, X, Tag, Megaphone, AlertCircle, Package, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,7 +27,6 @@ export default function Header() {
     }
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
@@ -94,18 +92,12 @@ export default function Header() {
   };
 
   const handleNotificationClick = (notification) => {
-    // Mark as read
     markAsRead(notification.id);
 
-    // Handle actionable notifications
     if (notification.actionable) {
-      // You can navigate or perform actions here
       console.log("Action:", notification.actionText, notification.actionData);
       
-      // Example: Navigate to order tracking
       if (notification.actionData?.orderNumber) {
-        // Navigate to order details page
-        // e.g., navigate(`/orders/${notification.actionData.orderNumber}`);
       }
     }
 
@@ -116,16 +108,13 @@ export default function Header() {
     <header className="sticky top-0 z-40 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-lg border-b border-gray-200/70 dark:border-neutral-800/70">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Brand */}
           <div className="flex items-center">
             <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
               EXOTIC
             </h1>
           </div>
 
-          {/* Right side actions */}
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Notification */}
             <div className="relative" ref={notificationRef}>
               <motion.button
                 onClick={() => setIsOpen(!isOpen)}
@@ -150,7 +139,6 @@ export default function Header() {
                 )}
               </motion.button>
 
-              {/* Notification Dropdown */}
               <AnimatePresence>
                 {isOpen && (
                   <motion.div
@@ -160,7 +148,6 @@ export default function Header() {
                     transition={{ duration: 0.2 }}
                     className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden"
                   >
-                    {/* Header */}
                     <div className="flex items-center justify-between border-b border-gray-200 dark:border-neutral-800 px-4 py-3">
                       <div>
                         <h3 className="text-lg font-bold text-gray-900 dark:text-white">
@@ -180,7 +167,6 @@ export default function Header() {
                       </button>
                     </div>
 
-                    {/* Notifications List */}
                     <div className="max-h-[400px] overflow-y-auto">
                       {notifications.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 px-4">
@@ -244,7 +230,6 @@ export default function Header() {
                       )}
                     </div>
 
-                    {/* Footer Actions */}
                     {notifications.length > 0 && (
                       <div className="border-t border-gray-200 dark:border-neutral-800 px-4 py-2 flex gap-2">
                         {unreadCount > 0 && (
@@ -268,7 +253,6 @@ export default function Header() {
               </AnimatePresence>
             </div>
 
-            {/* Theme toggle */}
             <motion.button
               onClick={toggleTheme}
               whileHover={{ scale: 1.08 }}

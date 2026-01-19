@@ -1,4 +1,3 @@
-// src/components/FloatingChat.jsx
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -21,7 +20,7 @@ import { toast } from "./ToastContainer";
 
 export default function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeView, setActiveView] = useState("main"); // main, contact, faq, form
+  const [activeView, setActiveView] = useState("main");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -120,7 +119,6 @@ export default function FloatingChat() {
 
   return (
     <>
-      {/* Floating Button */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -134,23 +132,19 @@ export default function FloatingChat() {
             whileTap={{ scale: 0.95 }}
           >
             <MessageCircle size={24} />
-            
-            {/* Notification Badge (optional) */}
+      
             <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
               1
             </span>
 
-            {/* Ripple Effect */}
             <span className="absolute inset-0 rounded-full bg-rose-600 animate-ping opacity-75" />
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Chat Widget */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop for mobile */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -159,7 +153,6 @@ export default function FloatingChat() {
               className="fixed inset-0 bg-black/40 z-40 md:hidden"
             />
 
-            {/* Chat Window */}
             <motion.div
               initial={{ opacity: 0, y: 100, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -167,7 +160,6 @@ export default function FloatingChat() {
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
               className="fixed bottom-4 right-4 z-50 w-[calc(100vw-2rem)] md:w-96 max-h-[600px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
             >
-              {/* Header */}
               <div className="bg-gradient-to-r from-rose-600 to-orange-600 p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -197,10 +189,8 @@ export default function FloatingChat() {
                 </motion.button>
               </div>
 
-              {/* Content */}
               <div className="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-950">
                 <AnimatePresence mode="wait">
-                  {/* Main View */}
                   {activeView === "main" && (
                     <motion.div
                       key="main"
@@ -209,14 +199,12 @@ export default function FloatingChat() {
                       exit={{ opacity: 0, x: 20 }}
                       className="space-y-4"
                     >
-                      {/* Welcome Message */}
                       <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm">
                         <p className="text-sm text-gray-600 dark:text-gray-300">
                           👋 Hi there! How can we help you today?
                         </p>
                       </div>
 
-                      {/* Quick Actions */}
                       <div className="space-y-2">
                         {quickActions.map((action) => (
                           <motion.button
@@ -241,7 +229,6 @@ export default function FloatingChat() {
                         ))}
                       </div>
 
-                      {/* Business Info */}
                       <div className="bg-gradient-to-br from-rose-50 to-orange-50 dark:from-rose-950/20 dark:to-orange-950/20 rounded-xl p-4 space-y-2 border border-rose-200 dark:border-rose-800">
                         <div className="flex items-center gap-2 text-sm">
                           <Clock size={16} className="text-rose-600 dark:text-rose-400" />
@@ -259,7 +246,6 @@ export default function FloatingChat() {
                     </motion.div>
                   )}
 
-                  {/* FAQ View */}
                   {activeView === "faq" && (
                     <motion.div
                       key="faq"
@@ -304,7 +290,6 @@ export default function FloatingChat() {
                     </motion.div>
                   )}
 
-                  {/* Contact Form View */}
                   {activeView === "form" && (
                     <motion.div
                       key="form"
@@ -381,7 +366,6 @@ export default function FloatingChat() {
                 </AnimatePresence>
               </div>
 
-              {/* Footer */}
               <div className="border-t dark:border-gray-800 p-3 bg-white dark:bg-gray-900">
                 <p className="text-xs text-center text-gray-500 dark:text-gray-400">
                   We typically reply within 30 minutes

@@ -1,9 +1,7 @@
-// src/components/ToastContainer.jsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, X, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 
-// Toast manager
 let toastId = 0;
 const toastListeners = new Set();
 
@@ -28,7 +26,6 @@ function showToast(toast) {
   toastListeners.forEach(listener => listener(toastWithId));
 }
 
-// Toast Container Component
 export default function ToastContainer() {
   const [toasts, setToasts] = useState([]);
 
@@ -36,7 +33,6 @@ export default function ToastContainer() {
     const listener = (newToast) => {
       setToasts(prev => [...prev, newToast]);
 
-      // Auto remove after duration
       setTimeout(() => {
         setToasts(prev => prev.filter(t => t.id !== newToast.id));
       }, newToast.duration);

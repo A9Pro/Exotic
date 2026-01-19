@@ -1,109 +1,109 @@
-import { motion } from "framer-motion";
-import { Home, Menu, ShoppingCart, User } from "lucide-react";
+// src/components/BottomNav.jsx
+import { motion, AnimatePresence } from "framer-motion";
+import { Home, UtensilsCrossed, ShoppingCart, User } from "lucide-react";
 
-export default function BottomNav({
-  cartCount = 0,
-  active = "Home",
-  onNavigate,
-}) {
+export default function BottomNav({ cartCount = 0, active = "Home", onNavigate }) {
   const navItems = [
-    { label: "Home", icon: Home, value: "Home" },
-    { label: "Menu", icon: Menu, value: "Menu" },
-    { label: "Cart", icon: ShoppingCart, value: "Cart" },
-    { label: "Profile", icon: User, value: "Profile" },
+    { id: "Home", label: "Home", icon: Home },
+    { id: "Menu", label: "Menu", icon: UtensilsCrossed },
+    { id: "Cart", label: "Cart", icon: ShoppingCart, badge: cartCount },
+    { id: "Profile", label: "Profile", icon: User },
   ];
 
   return (
-    <motion.nav
-      className={`
-        fixed bottom-4 sm:bottom-6
-        left-0 right-0 mx-auto
-        z-50
-        bg-white/70 dark:bg-black/70
-        backdrop-blur-lg
-        border border-white/20 dark:border-white/10
-        shadow-xl shadow-black/10 dark:shadow-black/40
-        rounded-2xl
-        px-5 sm:px-8 py-3
-        flex items-center justify-around
-        w-[92%] max-w-[380px]
-        touch-manipulation
-      `}
-      initial={{ y: 100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 140, damping: 20 }}
-    >
-      {navItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = active === item.value;
+    <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 shadow-lg">
+      <div className="mx-auto max-w-md">
+        <div className="flex items-center justify-around px-2 py-3">
+          {navItems.map((item) => {
+            const isActive = active === item.id;
+            const Icon = item.icon;
 
-        return (
-          <button
-            key={item.value}
-            type="button"
-            aria-label={item.label}
-            onClick={() => onNavigate(item.value)}
-            className={`
-              group relative flex flex-col items-center justify-center
-              min-w-[52px] px-2 py-1
-              transition-all duration-200
-              ${isActive
-                ? "text-exotic-red"
-                : "text-gray-600 hover:text-exotic-red dark:text-gray-300 dark:hover:text-exotic-red"}
-            `}
-          >
-            <div className="relative">
-              <Icon
-                size={22}
-                strokeWidth={isActive ? 2.4 : 2}
-                className="transition-transform duration-200 group-hover:scale-110"
-              />
+            return (
+              <motion.button
+                key={item.id}
+                onClick={() => onNavigate(item.id)}
+                className="relative flex flex-col items-center justify-center min-w-[60px] py-1"
+                whileTap={{ scale: 0.9 }}
+                animate={isActive ? { y: -2 } : { y: 0 }}
+              >
+                {/* Icon Container */}
+                <div className="relative">
+                  <motion.div
+                    className={`p-2 rounded-xl transition-colors ${
+                      isActive
+                        ? "bg-exotic-lightRed"
+                        : "bg-transparent"
+                    }`}
+                    animate={isActive ? { scale: 1 } : { scale: 1 }}
+                  >
+                    <Icon
+                      size={22}
+                      className={`transition-colors ${
+                        isActive
+                          ? "text-exotic-red"
+                          : "text-gray-600 dark:text-gray-400"
+                      }`}
+                      strokeWidth={isActive ? 2.5 : 2}
+                    />
+                  </motion.div>
 
-              {item.value === "Cart" && cartCount > 0 && (
+                  {/* Badge (for Cart) */}
+                  <AnimatePresence>
+                    {item.badge > 0 && (
+                      <motion.div
+                        key="badge"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 15,
+                        }}
+                        className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 bg-exotic-red text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white dark:ring-gray-900"
+                      >
+                        <motion.span
+                          key={item.badge} // Re-animate when count changes
+                          initial={{ scale: 1.5 }}
+                          animate={{ scale: 1 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {item.badge > 99 ? "99+" : item.badge}
+                        </motion.span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Label */}
                 <motion.span
-                  key={cartCount}
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="
-                    absolute -top-2 -right-2
-                    bg-exotic-red text-white
-                    text-[10px] font-bold
-                    min-w-[16px] h-4
-                    flex items-center justify-center
-                    px-1 rounded-full
-                    border-2 border-white dark:border-gray-900
-                    shadow-sm
-                  "
+                  className={`text-xs mt-1 font-medium transition-colors ${
+                    isActive
+                      ? "text-exotic-red"
+                      : "text-gray-600 dark:text-gray-400"
+                  }`}
+                  animate={isActive ? { scale: 1.05 } : { scale: 1 }}
                 >
-                  {cartCount > 99 ? "99+" : cartCount}
+                  {item.label}
                 </motion.span>
-              )}
-            </div>
 
-            <span
-              className={`
-                text-[10px] sm:text-xs mt-1 font-medium
-                transition-colors duration-200
-                ${isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100"}
-              `}
-            >
-              {item.label}
-            </span>
-
-            {isActive && (
-              <motion.div
-                layoutId="activeIndicator"
-                className="
-                  absolute -bottom-1.5
-                  w-5 h-1 rounded-full
-                  bg-exotic-red
-                "
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              />
-            )}
-          </button>
-        );
-      })}
-    </motion.nav>
+                {/* Active Indicator Dot */}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeIndicator"
+                    className="absolute -bottom-1 w-1 h-1 bg-exotic-red rounded-full"
+                    transition={{
+                      type: "spring",
+                      stiffness: 380,
+                      damping: 30,
+                    }}
+                  />
+                )}
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+    </nav>
   );
 }

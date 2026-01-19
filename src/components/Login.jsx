@@ -1,4 +1,3 @@
-// src/components/Login.jsx
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { LogIn, UserPlus } from "lucide-react";
@@ -26,13 +25,11 @@ export default function Login({ onLoginSuccess }) {
     e.preventDefault();
 
     if (isSignUp) {
-      // Sign Up validation
       if (!formData.name || !formData.email || !formData.phone || !formData.password) {
         alert("Please fill in all fields");
         return;
       }
     } else {
-      // Login validation
       if (!formData.email || !formData.password) {
         alert("Please enter email and password");
         return;
@@ -41,7 +38,6 @@ export default function Login({ onLoginSuccess }) {
 
     setLoading(true);
 
-    // Simulate API call
     setTimeout(() => {
       const userData = {
         name: formData.name || "Guest User",
@@ -50,7 +46,6 @@ export default function Login({ onLoginSuccess }) {
         whatsapp: formData.phone || "0803 123 4567",
       };
 
-      // Save to localStorage
       localStorage.setItem("exotic_user", JSON.stringify(userData));
       
       setLoading(false);

@@ -1,10 +1,3 @@
-// src/services/notificationService.js
-
-/**
- * Centralized notification service
- * Use this to trigger notifications from anywhere in your app
- */
-
 export const NotificationTypes = {
   ORDER: 'order',
   PROMO: 'promo',
@@ -13,9 +6,6 @@ export const NotificationTypes = {
   SYSTEM: 'system',
 };
 
-/**
- * Order Status Notifications
- */
 export const orderNotifications = {
   orderPlaced: (orderNumber) => ({
     type: NotificationTypes.ORDER,
@@ -62,15 +52,12 @@ export const orderNotifications = {
   }),
 };
 
-/**
- * Promotional Notifications
- */
 export const promoNotifications = {
   flashSale: (discount, items) => ({
     type: NotificationTypes.PROMO,
     title: `Flash Sale! ${discount}% Off`,
     message: `Get ${discount}% off on ${items}. Limited time only!`,
-    showToast: false, // Don't show toast for promos
+    showToast: false, 
     actionable: true,
     actionText: 'Shop Now',
     actionData: { promo: true },
@@ -100,9 +87,6 @@ export const promoNotifications = {
   }),
 };
 
-/**
- * System Announcements
- */
 export const systemNotifications = {
   newMenu: (items) => ({
     type: NotificationTypes.ANNOUNCEMENT,
@@ -135,9 +119,6 @@ export const systemNotifications = {
   }),
 };
 
-/**
- * News & Updates
- */
 export const newsNotifications = {
   socialMedia: (platform) => ({
     type: NotificationTypes.NEWS,
@@ -158,36 +139,24 @@ export const newsNotifications = {
   }),
 };
 
-/**
- * Simulated real-time events
- * In production, these would come from your backend via WebSocket/SSE/Polling
- */
 export const simulateRealTimeEvents = (addNotification) => {
-  // Simulate order updates
   const orderNumber = Math.floor(1000 + Math.random() * 9000);
-  
-  // Order placed (immediate)
+
   addNotification(orderNotifications.orderPlaced(orderNumber));
 
-  // Order preparing (after 2 minutes)
   setTimeout(() => {
     addNotification(orderNotifications.orderPreparing(orderNumber));
   }, 2 * 60 * 1000);
 
-  // Out for delivery (after 15 minutes)
   setTimeout(() => {
     addNotification(orderNotifications.orderOutForDelivery(orderNumber, 25));
   }, 15 * 60 * 1000);
 
-  // Delivered (after 40 minutes)
   setTimeout(() => {
     addNotification(orderNotifications.orderDelivered(orderNumber));
   }, 40 * 60 * 1000);
 };
 
-/**
- * Demo function to test notifications
- */
 export const sendTestNotifications = (addNotification) => {
   const notifications = [
     orderNotifications.orderPlaced(1234),

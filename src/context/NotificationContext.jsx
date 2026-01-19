@@ -1,4 +1,3 @@
-// src/context/NotificationContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from '../components/ToastContainer';
 
@@ -16,7 +15,6 @@ export function NotificationProvider({ children }) {
   const [notifications, setNotifications] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Load notifications from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('exotic_notifications');
     if (saved) {
@@ -29,12 +27,10 @@ export function NotificationProvider({ children }) {
     }
   }, []);
 
-  // Save notifications to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('exotic_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
-  // Add a new notification
   const addNotification = (notification) => {
     const newNotification = {
       id: Date.now(),
@@ -46,44 +42,36 @@ export function NotificationProvider({ children }) {
 
     setNotifications(prev => [newNotification, ...prev]);
 
-    // Show toast for important notifications
     if (notification.showToast !== false) {
       const toastType = notification.type === 'order' ? 'success' : 'info';
       toast[toastType](notification.title);
     }
 
-    // Play notification sound (optional)
     playNotificationSound();
 
     return newNotification;
   };
 
-  // Mark notification as read
   const markAsRead = (notificationId) => {
     setNotifications(prev =>
       prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
     );
   };
 
-  // Mark all as read
   const markAllAsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
-  // Clear all notifications
   const clearAll = () => {
     setNotifications([]);
   };
 
-  // Remove single notification
   const removeNotification = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
   };
 
-  // Get unread count
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  // Update relative timestamps
   useEffect(() => {
     const updateTimes = () => {
       setNotifications(prev =>
@@ -94,16 +82,12 @@ export function NotificationProvider({ children }) {
       );
     };
 
-    // Update every minute
     const interval = setInterval(updateTimes, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Play notification sound
   const playNotificationSound = () => {
-    // You can add a notification sound here
-    // const audio = new Audio('/notification.mp3');
-    // audio.play().catch(e => console.log('Could not play sound:', e));
+
   };
 
   const value = {
@@ -125,7 +109,6 @@ export function NotificationProvider({ children }) {
   );
 }
 
-// Helper function to get relative time
 function getRelativeTime(timestamp) {
   const now = Date.now();
   const diff = now - timestamp;

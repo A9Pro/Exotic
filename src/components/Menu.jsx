@@ -1,4 +1,3 @@
-// src/components/Menu.jsx
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Filter, X } from "lucide-react";
@@ -326,7 +325,6 @@ export default function Menu({ onAddToCart }) {
       initial="hidden"
       animate="show"
     >
-      {/* Header */}
       <motion.div variants={categoryVariant} className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Our Menu
@@ -336,7 +334,6 @@ export default function Menu({ onAddToCart }) {
         </p>
       </motion.div>
 
-      {/* Search Bar */}
       <motion.div variants={categoryVariant} className="mb-6">
         <div className="relative">
           <Search
@@ -363,7 +360,6 @@ export default function Menu({ onAddToCart }) {
         </div>
       </motion.div>
 
-      {/* Category Filter */}
       <motion.div variants={categoryVariant} className="mb-8">
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {categories.map((category) => (
@@ -384,7 +380,6 @@ export default function Menu({ onAddToCart }) {
         </div>
       </motion.div>
 
-      {/* Menu Items */}
       <div className="space-y-10">
         {filteredCategories.map((category) => (
           <motion.section key={category.title} variants={categoryVariant}>
@@ -402,7 +397,6 @@ export default function Menu({ onAddToCart }) {
                 <motion.div key={dish.name} variants={itemVariant}>
                   <Card className="h-full overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700 group">
                     <div className="flex flex-col h-full">
-                      {/* Image */}
                       <div className="relative aspect-[16/10] overflow-hidden bg-gray-200 dark:bg-gray-800">
                         <img
                           src={dish.img}
@@ -415,7 +409,6 @@ export default function Menu({ onAddToCart }) {
                           }}
                         />
                         
-                        {/* Badges */}
                         <div className="absolute top-2 left-2 flex gap-2">
                           {dish.popular && (
                             <span className="bg-rose-600 text-white text-xs px-2 py-1 rounded-full font-medium">
@@ -437,7 +430,6 @@ export default function Menu({ onAddToCart }) {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
 
-                      {/* Content */}
                       <div className="p-5 flex flex-col flex-grow">
                         <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">
                           {dish.name}
@@ -470,7 +462,6 @@ export default function Menu({ onAddToCart }) {
         ))}
       </div>
 
-      {/* No Results */}
       {filteredCategories.length === 0 && (
         <motion.div variants={categoryVariant} className="text-center py-20">
           <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">

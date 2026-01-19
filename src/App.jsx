@@ -25,10 +25,8 @@ function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [orderHistory, setOrderHistory] = useState([]);
 
-  // Get notification context
   const { addNotification } = useNotifications();
 
-  // Load saved data on mount
   useEffect(() => {
     const savedUser = localStorage.getItem("exotic_user");
     const savedCart = localStorage.getItem("exotic_cart");
@@ -52,7 +50,6 @@ function AppContent() {
     }
   }, []);
 
-  // Persist cart to localStorage
   useEffect(() => {
     localStorage.setItem("exotic_cart", JSON.stringify(cartItems));
   }, [cartItems]);
@@ -104,6 +101,7 @@ function AppContent() {
     } else {
       setActiveTab(tab);
       setShowCheckout(false);
+      setIsCartOpen(false); // Close cart when navigating
     }
   };
 
@@ -116,7 +114,6 @@ function AppContent() {
     stats.totalSpent += orderTotal;
     localStorage.setItem("exotic_customer_stats", JSON.stringify(stats));
 
-    // Generate order number
     const orderNumber = Math.floor(1000 + Math.random() * 9000);
 
     const newOrder = {
@@ -132,7 +129,7 @@ function AppContent() {
       }),
       items: [...cartItems],
       total: orderTotal,
-      status: "confirmed", // confirmed, preparing, delivering, delivered
+      status: "confirmed",
     };
 
     setOrderHistory((prev) => {
@@ -141,7 +138,6 @@ function AppContent() {
       return updated;
     });
 
-    // Clear cart and return to home
     setCartItems([]);
     setCartCount(0);
     setShowCheckout(false);
@@ -150,21 +146,19 @@ function AppContent() {
     
     toast.success("Order placed successfully! 🎉");
 
-    // Add real-time notifications for order tracking
     addNotification(orderNotifications.orderPlaced(orderNumber));
 
-    // Simulate order status updates (for demo - in production these would come from backend)
     setTimeout(() => {
       addNotification(orderNotifications.orderPreparing(orderNumber));
-    }, 3000); // 3 seconds for demo (in production: 2 minutes)
+    }, 3000);
 
     setTimeout(() => {
       addNotification(orderNotifications.orderOutForDelivery(orderNumber, 25));
-    }, 8000); // 8 seconds for demo (in production: 15 minutes)
+    }, 8000); 
 
     setTimeout(() => {
       addNotification(orderNotifications.orderDelivered(orderNumber));
-    }, 15000); // 15 seconds for demo (in production: 40 minutes)
+    }, 15000);
   };
 
   const handleLoginSuccess = (userData) => {
@@ -172,7 +166,6 @@ function AppContent() {
     setIsAuthenticated(true);
     toast.success(`Welcome back, ${userData.name}!`);
 
-    // Send welcome promo notification for first-time users
     if (!localStorage.getItem("exotic_first_login")) {
       setTimeout(() => {
         addNotification(promoNotifications.firstOrderDiscount());
@@ -218,7 +211,6 @@ function AppContent() {
     }, 500);
   };
 
-  // Animation variants
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -276,6 +268,244 @@ function AppContent() {
     },
   ];
 
+  // Render current tab content
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "Home":
+        return (
+          <motion.div
+            key="home"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.section variants={itemFadeUp} className="relative mb-8">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                <img
+                  src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&h=600&fit=crop"
+                  alt="Exotic cuisine hero"
+                  className="w-full h-[280px] sm:h-[320px] object-cover"
+                  loading="eager"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+
+                <div className="absolute bottom-0 left-0 right-0 p-6 pb-7">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-2">
+                      Exotic Flavors
+                    </h1>
+                    <p className="text-white/95 text-base sm:text-lg font-light mb-1">
+                      Authentic Nigerian Cuisine
+                    </p>
+                    <p className="text-white/80 text-sm">
+                      ⭐ 4.9 Rating • 2,500+ Orders • Fast Delivery
+                    </p>
+                  </motion.div>
+
+                  <motion.div 
+                    className="mt-5 flex gap-3"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    <Button 
+                      size="lg" 
+                      className="flex-1 shadow-xl"
+                      onClick={() => setActiveTab("Menu")}
+                    >
+                      Order Now
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="flex-1 bg-white/15 backdrop-blur-md border-white/30 text-white hover:bg-white/25"
+                      onClick={() => setActiveTab("Menu")}
+                    >
+                      View Menu
+                    </Button>
+                  </motion.div>
+                </div>
+              </div>
+            </motion.section>
+
+            <motion.section variants={itemFadeUp} className="mb-8">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Featured Dishes
+                </h2>
+                <button
+                  onClick={() => setActiveTab("Menu")}
+                  className="text-sm text-exotic-red dark:text-exotic-red font-medium hover:underline"
+                >
+                  View All
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {featuredDishes.map((dish) => (
+                  <motion.div key={dish.name} variants={itemFadeUp}>
+                    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center p-4 gap-4">
+                        <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
+                          <img
+                            src={dish.img}
+                            alt={dish.name}
+                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=600&fit=crop";
+                            }}
+                          />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-base text-gray-900 dark:text-white line-clamp-1">
+                            {dish.name}
+                          </h3>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1 line-clamp-2">
+                            {dish.desc}
+                          </p>
+
+                          <div className="mt-3 flex items-center justify-between">
+                            <span className="text-xl font-bold text-exotic-red">
+                              ₦{dish.price.toLocaleString()}
+                            </span>
+
+                            <Button
+                              size="sm"
+                              onClick={() => handleAddToCart(dish)}
+                              className="min-w-[90px] shadow-sm"
+                            >
+                              + Add
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+
+            <motion.section variants={itemFadeUp} className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-5">
+                Why Choose Us
+              </h2>
+
+              <div className="grid grid-cols-2 gap-4">
+                {features.map((feature, idx) => (
+                  <motion.div
+                    key={feature.title}
+                    variants={itemFadeUp}
+                    custom={idx}
+                  >
+                    <Card className="p-4 text-center hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-800">
+                      <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-exotic-lightRed flex items-center justify-center">
+                        <feature.icon size={24} className="text-exotic-red" />
+                      </div>
+                      <h3 className="font-semibold text-sm text-gray-900 dark:text-white mb-1">
+                        {feature.title}
+                      </h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                        {feature.desc}
+                      </p>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+
+            <motion.section
+              variants={itemFadeUp}
+              className="bg-gradient-to-br from-exotic-red to-red-700 rounded-3xl p-6 text-white shadow-xl"
+            >
+              <h2 className="text-2xl font-bold mb-2">
+                Ready to Order?
+              </h2>
+              <p className="text-white/90 mb-5">
+                Explore our full menu and get your favorite dishes delivered fresh to your doorstep
+              </p>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full bg-white text-exotic-red hover:bg-gray-100 border-0"
+                onClick={() => setActiveTab("Menu")}
+              >
+                Browse Full Menu
+              </Button>
+            </motion.section>
+          </motion.div>
+        );
+
+      case "Menu":
+        return (
+          <motion.div
+            key="menu"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Menu onAddToCart={handleAddToCart} />
+          </motion.div>
+        );
+
+      case "Profile":
+        return (
+          <motion.div
+            key="profile"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {isAuthenticated ? (
+              <Profile
+                user={user}
+                onLogout={handleLogout}
+                onUpdateUser={handleUpdateUser}
+                orderHistory={orderHistory}
+                onReorder={handleReorder}
+              />
+            ) : (
+              <Login onLoginSuccess={handleLoginSuccess} />
+            )}
+          </motion.div>
+        );
+
+      case "Cart":
+        return (
+          <motion.div
+            key="cart"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="py-20 text-center text-gray-600 dark:text-gray-400"
+          >
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Your Cart</h2>
+            <p className="mb-6">Use the cart icon to view your items</p>
+            <Button onClick={() => setIsCartOpen(true)}>
+              Open Cart ({cartCount})
+            </Button>
+          </motion.div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
       <ToastContainer />
@@ -307,206 +537,9 @@ function AppContent() {
               initial="hidden"
               animate="show"
             >
-              {activeTab === "Home" && (
-                <>
-                  {/* HERO SECTION */}
-                  <motion.section variants={itemFadeUp} className="relative mb-8">
-                    <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                      <img
-                        src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&h=600&fit=crop"
-                        alt="Exotic cuisine hero"
-                        className="w-full h-[280px] sm:h-[320px] object-cover"
-                        loading="eager"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-
-                      <div className="absolute bottom-0 left-0 right-0 p-6 pb-7">
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.2 }}
-                        >
-                          <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-2">
-                            Exotic Flavors
-                          </h1>
-                          <p className="text-white/95 text-base sm:text-lg font-light mb-1">
-                            Authentic Nigerian Cuisine
-                          </p>
-                          <p className="text-white/80 text-sm">
-                            ⭐ 4.9 Rating • 2,500+ Orders • Fast Delivery
-                          </p>
-                        </motion.div>
-
-                        <motion.div 
-                          className="mt-5 flex gap-3"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.4 }}
-                        >
-                          <Button 
-                            size="lg" 
-                            className="flex-1 shadow-xl"
-                            onClick={() => setActiveTab("Menu")}
-                          >
-                            Order Now
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="lg"
-                            className="flex-1 bg-white/15 backdrop-blur-md border-white/30 text-white hover:bg-white/25"
-                            onClick={() => setActiveTab("Menu")}
-                          >
-                            View Menu
-                          </Button>
-                        </motion.div>
-                      </div>
-                    </div>
-                  </motion.section>
-
-                  {/* FEATURED DISHES */}
-                  <motion.section variants={itemFadeUp} className="mb-8">
-                    <div className="flex items-center justify-between mb-5">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                        Featured Dishes
-                      </h2>
-                      <button
-                        onClick={() => setActiveTab("Menu")}
-                        className="text-sm text-rose-600 dark:text-rose-400 font-medium hover:underline"
-                      >
-                        View All
-                      </button>
-                    </div>
-
-                    <div className="space-y-4">
-                      {featuredDishes.map((dish) => (
-                        <motion.div key={dish.name} variants={itemFadeUp}>
-                          <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800">
-                            <div className="flex items-center p-4 gap-4">
-                              <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
-                                <img
-                                  src={dish.img}
-                                  alt={dish.name}
-                                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                                  loading="lazy"
-                                  onError={(e) => {
-                                    e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=600&fit=crop";
-                                  }}
-                                />
-                              </div>
-
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-bold text-base text-gray-900 dark:text-white line-clamp-1">
-                                  {dish.name}
-                                </h3>
-                                <p className="text-gray-600 dark:text-gray-400 text-sm mt-1 line-clamp-2">
-                                  {dish.desc}
-                                </p>
-
-                                <div className="mt-3 flex items-center justify-between">
-                                  <span className="text-xl font-bold text-rose-600 dark:text-rose-400">
-                                    ₦{dish.price.toLocaleString()}
-                                  </span>
-
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleAddToCart(dish)}
-                                    className="min-w-[90px] shadow-sm"
-                                  >
-                                    + Add
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </Card>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </motion.section>
-
-                  {/* FEATURES GRID */}
-                  <motion.section variants={itemFadeUp} className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-5">
-                      Why Choose Us
-                    </h2>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      {features.map((feature, idx) => (
-                        <motion.div
-                          key={feature.title}
-                          variants={itemFadeUp}
-                          custom={idx}
-                        >
-                          <Card className="p-4 text-center hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-800">
-                            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-rose-100 dark:bg-rose-950/30 flex items-center justify-center">
-                              <feature.icon size={24} className="text-rose-600 dark:text-rose-400" />
-                            </div>
-                            <h3 className="font-semibold text-sm text-gray-900 dark:text-white mb-1">
-                              {feature.title}
-                            </h3>
-                            <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-                              {feature.desc}
-                            </p>
-                          </Card>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </motion.section>
-
-                  {/* CTA SECTION */}
-                  <motion.section
-                    variants={itemFadeUp}
-                    className="bg-gradient-to-br from-rose-600 to-orange-600 rounded-3xl p-6 text-white shadow-xl"
-                  >
-                    <h2 className="text-2xl font-bold mb-2">
-                      Ready to Order?
-                    </h2>
-                    <p className="text-white/90 mb-5">
-                      Explore our full menu and get your favorite dishes delivered fresh to your doorstep
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="w-full bg-white text-rose-600 hover:bg-gray-100 border-0"
-                      onClick={() => setActiveTab("Menu")}
-                    >
-                      Browse Full Menu
-                    </Button>
-                  </motion.section>
-                </>
-              )}
-
-              {activeTab === "Menu" && <Menu onAddToCart={handleAddToCart} />}
-
-              {activeTab === "Profile" && (
-                <>
-                  {isAuthenticated ? (
-                    <Profile
-                      user={user}
-                      onLogout={handleLogout}
-                      onUpdateUser={handleUpdateUser}
-                      orderHistory={orderHistory}
-                      onReorder={handleReorder}
-                    />
-                  ) : (
-                    <Login onLoginSuccess={handleLoginSuccess} />
-                  )}
-                </>
-              )}
-
-              {activeTab === "Cart" && (
-                <div className="py-20 text-center text-gray-600 dark:text-gray-400">
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
-                  </div>
-                  <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Your Cart</h2>
-                  <p className="mb-6">Use the cart icon to view your items</p>
-                  <Button onClick={() => setIsCartOpen(true)}>
-                    Open Cart ({cartCount})
-                  </Button>
-                </div>
-              )}
+              <AnimatePresence mode="wait">
+                {renderTabContent()}
+              </AnimatePresence>
             </motion.main>
           )}
         </AnimatePresence>
@@ -533,7 +566,6 @@ function AppContent() {
   );
 }
 
-// Wrap entire app with NotificationProvider
 export default function App() {
   return (
     <NotificationProvider>
