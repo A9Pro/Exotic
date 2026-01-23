@@ -109,8 +109,23 @@ export default function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              EXOTIC
+            {/* Logo Image */}
+            <img 
+              src="/logo.png" 
+              alt="Exotic Glamz" 
+              className="h-20 w-auto sm:h-24 md:h-28"
+              onError={(e) => {
+                // Fallback if image doesn't load
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'block';
+              }}
+            />
+            {/* Fallback text (hidden by default) */}
+            <h1 
+              className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+              style={{ display: 'none' }}
+            >
+              EXOTIC GLAMZ
             </h1>
           </div>
 

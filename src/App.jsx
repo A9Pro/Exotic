@@ -13,6 +13,7 @@ import Menu from "./components/Menu";
 import FloatingChat from "./components/FloatingChat";
 import ToastContainer, { toast } from "./components/ToastContainer";
 import { NotificationProvider, useNotifications } from "./context/NotificationContext";
+import ProductListing from './components/ProductListing'
 import { orderNotifications, promoNotifications } from "./services/notificationService";
 
 function AppContent() {
@@ -322,7 +323,7 @@ function AppContent() {
                             transition={{ delay: 0.2 }}
                           >
                             <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-2">
-                              Exotic Flavors
+                              Exotic Glamz
                             </h1>
                             <p className="text-white/95 text-base sm:text-lg font-light mb-1">
                               Authentic Nigerian Cuisine
